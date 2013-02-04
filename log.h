@@ -1,4 +1,4 @@
-/* 
+/*
    This file is part of elementals (http://elementals.sf.net).
    Copyright 2013, Hans Oesterholt <debian@oesterholt.net>
 
@@ -47,12 +47,26 @@ void reset_log_handle_to_space(const char *space);
 
 #define log_flush()	fseek(log_handle(),0,SEEK_END)
 
-#define log_msg(severity,msg)  (fprintf(log_handle(),"%s:%s[%d]:%s: %s\n",log_severity(severity),__FILE__,__LINE__,__FUNCTION__,msg),log_flush())
-#define log_msg2(severity,template,msg) (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__),fprintf(log_handle(),template,msg),fprintf(log_handle(),"\n"),log_flush())
-#define log_msg3(severity,template,msg,m2) (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__),fprintf(log_handle(),template,msg,m2),fprintf(log_handle(),"\n"),log_flush())
+#define log_msg(severity,msg)  \
+    (fprintf(log_handle(),"%s:%s[%d]:%s: %s\n",log_severity(severity),__FILE__,__LINE__,__FUNCTION__,msg), \
+     log_flush())
+
+#define log_msg2(severity,template,msg) \
+    (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+     fprintf(log_handle(),template,msg),fprintf(log_handle(),"\n"),log_flush())
+
+#define log_msg3(severity,template,msg,m2) \
+    (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+     fprintf(log_handle(),template,msg,m2),fprintf(log_handle(),"\n"),log_flush())
+
 #define log_msg4(severity,template,msg,m2,m3) \
    (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
     fprintf(log_handle(),template,msg,m2,m3),fprintf(log_handle(),"\n"),log_flush())
+
+#define log_msg5(severity,template,msg,m2,m3,m4) \
+   (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+    fprintf(log_handle(),template,msg,m2,m3,m4),fprintf(log_handle(),"\n"),log_flush())
+
 
 #define log_fcall(msg)  log_msg(LOG_FCALL,msg)
 
@@ -88,6 +102,11 @@ void reset_log_handle_to_space(const char *space);
 #define log_fatal4(template,msg,m2,m3) (log_msg4(LOG_FATAL,template,msg,m2,m3),abort())
 #define log_info4(template,msg,m2,m3) log_msg4(LOG_INFO,template,msg,m2,m3)
 #define log_error4(template,msg,m2,m3) log_msg4(LOG_ERROR,template,msg,m2,m3)
+
+#define log_debug5(template,msg,m2,m3,m4) log_msg5(LOG_DEBUG,template,msg,m2,m3,m4)
+#define log_fatal5(template,msg,m2,m3,m4) (log_msg5(LOG_FATAL,template,msg,m2,m3,m4),abort())
+#define log_info5(template,msg,m2,m3,m4) log_msg5(LOG_INFO,template,msg,m2,m3,m4)
+#define log_error5(template,msg,m2,m3,m4) log_msg5(LOG_ERROR,template,msg,m2,m3,m4)
 
 
 #define cond_log_error2(cond,template,msg) if (cond) { log_error2(template,msg); }

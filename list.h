@@ -1,4 +1,4 @@
-/* 
+/*
    This file is part of elementals (http://elementals.sf.net).
    Copyright 2013, Hans Oesterholt <debian@oesterholt.net>
 
@@ -57,8 +57,6 @@ void         _list_prepend_iter(list_t *,list_data_t data);
 void         _list_append_iter(list_t *,list_data_t data);
 void		  _list_move_iter(list_t *,list_pos_t pos);
 
-
-
 #define DECLARE_LIST(NAME,T) \
   typedef list_t  NAME; \
   NAME * NAME##_new(); \
@@ -74,7 +72,7 @@ void		  _list_move_iter(list_t *,list_pos_t pos);
   T *      NAME##_iter_at(NAME *l, int i); \
   void     NAME##_move_iter(NAME *l,list_pos_t pos); \
   void     NAME##_lock(NAME *l); \
-  void     NAME##_unlock(NAME *l); 
+  void     NAME##_unlock(NAME *l);
 
 #define IMPLEMENT_LIST(NAME,T,COPY,DESTROY) \
   NAME * NAME##_new() { return _list_new(); } \
