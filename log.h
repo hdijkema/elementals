@@ -44,28 +44,29 @@
 
 FILE * log_handle();
 void reset_log_handle_to_space(const char *space);
+inline int    log_this_severity();
 
 #define log_flush()	fseek(log_handle(),0,SEEK_END)
 
 #define log_msg(severity,msg)  \
-    (fprintf(log_handle(),"%s:%s[%d]:%s: %s\n",log_severity(severity),__FILE__,__LINE__,__FUNCTION__,msg), \
-     log_flush())
+    (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: %s\n",log_severity(severity),__FILE__,__LINE__,__FUNCTION__,msg), \
+     log_flush()) : 0)
 
 #define log_msg2(severity,template,msg) \
-    (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-     fprintf(log_handle(),template,msg),fprintf(log_handle(),"\n"),log_flush())
+    (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+     fprintf(log_handle(),template,msg),fprintf(log_handle(),"\n"),log_flush()) : 0)
 
 #define log_msg3(severity,template,msg,m2) \
-    (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-     fprintf(log_handle(),template,msg,m2),fprintf(log_handle(),"\n"),log_flush())
+    (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+     fprintf(log_handle(),template,msg,m2),fprintf(log_handle(),"\n"),log_flush()) : 0)
 
 #define log_msg4(severity,template,msg,m2,m3) \
-   (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-    fprintf(log_handle(),template,msg,m2,m3),fprintf(log_handle(),"\n"),log_flush())
+   (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+    fprintf(log_handle(),template,msg,m2,m3),fprintf(log_handle(),"\n"),log_flush()) : 0)
 
 #define log_msg5(severity,template,msg,m2,m3,m4) \
-   (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-    fprintf(log_handle(),template,msg,m2,m3,m4),fprintf(log_handle(),"\n"),log_flush())
+   (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+    fprintf(log_handle(),template,msg,m2,m3,m4),fprintf(log_handle(),"\n"),log_flush()) : 0)
 
 
 #define log_fcall(msg)  log_msg(LOG_FCALL,msg)
@@ -86,7 +87,6 @@ void reset_log_handle_to_space(const char *space);
 #define cond_log_fatal_errno(cond,msg) if (cond) { log_fatal_errno(msg); }
 
 #define log_assert(cond) cond_log_fatal(!(cond), "Assertion failed: " #cond )
-//#define log_assert(cond) if (!(cond)) { fprintf(log_handle(),"%s\n", #cond ); }
 
 #define log_debug2(template,msg) log_msg2(LOG_DEBUG,template,msg)
 #define log_fatal2(template,msg) (log_msg2(LOG_FATAL,template,msg),abort())
