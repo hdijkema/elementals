@@ -44,30 +44,20 @@
 
 FILE * log_handle();
 void reset_log_handle_to_space(const char *space);
-inline int    log_this_severity();
+inline int log_this_severity();
 
 #define log_flush()	fseek(log_handle(),0,SEEK_END)
 
-#define log_msg(severity,msg)  \
-    (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: %s\n",log_severity(severity),__FILE__,__LINE__,__FUNCTION__,msg), \
-     log_flush()) : 0)
+#define log_imsg(severity,code) \
+    ((log_this_severity(severity)) ? \
+      (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__),code, \
+      log_flush()) : 0)
 
-#define log_msg2(severity,template,msg) \
-    (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-     fprintf(log_handle(),template,msg),fprintf(log_handle(),"\n"),log_flush()) : 0)
-
-#define log_msg3(severity,template,msg,m2) \
-    (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-     fprintf(log_handle(),template,msg,m2),fprintf(log_handle(),"\n"),log_flush()) : 0)
-
-#define log_msg4(severity,template,msg,m2,m3) \
-   (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-    fprintf(log_handle(),template,msg,m2,m3),fprintf(log_handle(),"\n"),log_flush()) : 0)
-
-#define log_msg5(severity,template,msg,m2,m3,m4) \
-   (log_this_severity(severity) ? (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
-    fprintf(log_handle(),template,msg,m2,m3,m4),fprintf(log_handle(),"\n"),log_flush()) : 0)
-
+#define log_msg(severity,msg)  log_imsg(severity,fprintf(log_handle(),"%s\n",msg))
+#define log_msg2(severity,template,m1) log_imsg(severity,fprintf(log_handle(),template,m1))
+#define log_msg3(severity,template,m1,m2) log_imsg(severity,fprintf(log_handle(),template,m1,m2))
+#define log_msg4(severity,template,m1,m2,m3) log_imsg(severity,fprintf(log_handle(),template,m1,m2,m3))
+#define log_msg5(severity,template,m1,m2,m3,m4) log_imsg(severity,fprintf(log_handle(),template,m1,m2,m3,m4))
 
 #define log_fcall(msg)  log_msg(LOG_FCALL,msg)
 

@@ -56,9 +56,6 @@ int         hash_table_size(hash_t *hash);
   T *           NAME##_get(NAME *h,const char *key); \
   int           NAME##_exists(NAME *h,const char *key); \
   hash_iter_t   NAME##_iter(NAME *h); \
-  hash_iter_t   NAME##_iter_next(hash_iter_t it); \
-  int           NAME##_iter_end(hash_iter_t it); \
-  const char   *NAME##_iter_key(hash_iter_t it); \
   int           NAME##_count(NAME *h); \
   int           NAME##_table_size(NAME *h);
 
