@@ -45,6 +45,25 @@ void *_mc_malloc( size_t size, const char *func, const char *file, int line ) {
   return p;
 }
 
+void _mc_take_over( void *ptr, const char *func, const char *file, int line ) {
+  mc_check_init();
+
+  mc_list_lock(MEMLIST);
+  mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
+  while (e != NULL && e->ptr != ptr) {
+    e = mc_list_next_iter(MEMLIST);
+  }
+  if (e == NULL) {
+    log_error4("Cannot take over memory at %s, %s, %d",func,file,line);
+  } else {
+    e->func=func;
+    e->file=file;
+    e->line=line;
+  }
+  mc_list_unlock(MEMLIST);
+}
+
+
 void _mc_take_control( void *ptr, size_t size, const char *func, const char *file, int line ) {
   mc_check_init();
   mc_entry_t *e=(mc_entry_t *) malloc(sizeof(mc_entry_t));
