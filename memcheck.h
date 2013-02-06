@@ -24,15 +24,16 @@
   void  mc_init(void);
   void  mc_report(void);
 #else
-  #define mc_init()
   #define mc_malloc(s) malloc(s)
   #define mc_realloc(p,s) realloc(p,s)
   #define mc_calloc(n,s) calloc(n,s)
   #define mc_free(p) free(p)
+  #define mc_strdup(a)  strdup(a)
+  #define mc_take_control(p,s) p
+  #define mc_take_over(p) p
+
+  #define mc_init()
   #define mc_report()
-  #define mc_strdup(a)
-  #define mc_take_control(p,s)
-  #define mc_take_over(p)
 #endif
 
 
