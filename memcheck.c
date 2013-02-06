@@ -91,6 +91,7 @@ void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, i
   while (e != NULL && e->ptr != ptr) {
     e = mc_list_next_iter(MEMLIST);
   }
+
   if (e == NULL) {
     log_error5("Reallocation of unknown pointer %s,%s,%d with size %d",func,file,line,(int) size);
     mc_list_unlock(MEMLIST);
@@ -102,9 +103,9 @@ void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, i
     } else {
       e->ptr = p;
       e->size = size;
-      e->func=func;
+      /*e->func=func;
       e->file=file;
-      e->line=line;
+      e->line=line;*/
     }
     mc_list_unlock(MEMLIST);
     return p;
