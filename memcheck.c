@@ -47,6 +47,11 @@ void *_mc_malloc( size_t size, const char *func, const char *file, int line ) {
 
 void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, int line  ) {
   mc_check_init();
+
+  if (ptr == NULL) {
+    return _mc_malloc(size, func, file, line);
+  }
+
   mc_list_lock(MEMLIST);
   mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
   while (e != NULL && e->ptr != ptr) {
