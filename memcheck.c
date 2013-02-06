@@ -91,6 +91,9 @@ char *_mc_strdup( const char * s, const char *func, const char *file, int line )
 
 void _mc_free( void * ptr, const char *func, const char *file, int line  ) {
   mc_check_init();
+
+  if (ptr == NULL) return;
+
   mc_list_lock(MEMLIST);
   mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
 
