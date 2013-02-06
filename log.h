@@ -50,10 +50,12 @@ inline int log_this_severity();
 
 #define log_imsg(severity,code) \
     ((log_this_severity(severity)) ? \
-      (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__),code, \
-      log_flush()) : 0)
+      (fprintf(log_handle(),"%s:%s[%d]:%s: ",log_severity(severity),__FILE__,__LINE__,__FUNCTION__), \
+       code, \
+       fprintf(log_handle(),"\n"), \
+       log_flush()) : 0)
 
-#define log_msg(severity,msg)  log_imsg(severity,fprintf(log_handle(),"%s\n",msg))
+#define log_msg(severity,msg)  log_imsg(severity,fprintf(log_handle(),"%s",msg))
 #define log_msg2(severity,template,m1) log_imsg(severity,fprintf(log_handle(),template,m1))
 #define log_msg3(severity,template,m1,m2) log_imsg(severity,fprintf(log_handle(),template,m1,m2))
 #define log_msg4(severity,template,m1,m2,m3) log_imsg(severity,fprintf(log_handle(),template,m1,m2,m3))
