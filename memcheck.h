@@ -11,7 +11,7 @@
   char *_mc_strdup(const char *, const char *func, const char *file, int line );
   void  _mc_free( void * ptr, const char *func, const char *file, int line );
   void  _mc_take_control( void * ptr, size_t size, const char *func, const char *file, int line);
-  void  _mc_take_over( void * ptr, const char *func, const char *file, int line);
+  void *_mc_take_over( void * ptr, const char *func, const char *file, int line);
 
   #define mc_malloc(s) _mc_malloc(s,__FUNCTION__,__FILE__,__LINE__)
   #define mc_realloc(p,s) _mc_realloc(p,s,__FUNCTION__,__FILE__,__LINE__)
@@ -31,6 +31,8 @@
   #define mc_free(p) free(p)
   #define mc_report()
   #define mc_strdup(a)
+  #define mc_take_control(p,s)
+  #define mc_take_over(p)
 #endif
 
 

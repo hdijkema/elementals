@@ -45,7 +45,7 @@ void *_mc_malloc( size_t size, const char *func, const char *file, int line ) {
   return p;
 }
 
-void _mc_take_over( void *ptr, const char *func, const char *file, int line ) {
+void *_mc_take_over( void *ptr, const char *func, const char *file, int line ) {
   mc_check_init();
 
   mc_list_lock(MEMLIST);
@@ -61,6 +61,7 @@ void _mc_take_over( void *ptr, const char *func, const char *file, int line ) {
     e->line=line;
   }
   mc_list_unlock(MEMLIST);
+  return ptr;
 }
 
 
