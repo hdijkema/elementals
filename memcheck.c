@@ -6,6 +6,9 @@
 
 typedef struct {
   size_t  size;
+  const char *func;
+  const char *file;
+  int line;
   void   *ptr;
 } mc_entry_t;
 
@@ -26,11 +29,14 @@ static mc_list *MEMLIST=NULL;
 
 #define mc_check_init()  log_assert(MEMLIST!=NULL)
 
-void *mc_malloc( size_t size ) {
+void *_mc_malloc( size_t size, const char *func, const char *file, int line ) {
   mc_check_init();
   void *p=malloc(size);
   mc_entry_t *e=(mc_entry_t *) malloc(sizeof(mc_entry_t));
   e->size=size;
+  e->func=func;
+  e->file=file;
+  e->line=line;
   e->ptr=p;
   mc_list_lock(MEMLIST);
   mc_list_start_iter(MEMLIST,LIST_FIRST);
@@ -39,7 +45,7 @@ void *mc_malloc( size_t size ) {
   return p;
 }
 
-void *mc_realloc( void *ptr, size_t size ) {
+void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, int line  ) {
   mc_check_init();
   mc_list_lock(MEMLIST);
   mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
@@ -47,28 +53,38 @@ void *mc_realloc( void *ptr, size_t size ) {
     e = mc_list_next_iter(MEMLIST);
   }
   if (e == NULL) {
-    log_error3("Reallocation of unknown pointer %p with size %d",ptr,(int) size);
+    log_error5("Reallocation of unknown pointer %s,%s,%d with size %d",func,file,line,(int) size);
     mc_list_unlock(MEMLIST);
     return ptr;
   } else {
     void *p = realloc(ptr,size);
     if (p == NULL) {
-      log_error3("Realloc of pointer %p with size %d results in NULL",ptr,(int) size);
+      log_error5("Realloc of pointer %s,%s,%d with size %d results in NULL",e->func,e->file,e->line,(int) size);
     } else {
       e->ptr = p;
       e->size = size;
+      e->func=func;
+      e->file=file;
+      e->line=line;
     }
     mc_list_unlock(MEMLIST);
     return p;
   }
 }
 
-void *mc_calloc( size_t num, size_t size ) {
+void *_mc_calloc( size_t num, size_t size, const char *func, const char *file, int line  ) {
   mc_check_init();
-  return mc_malloc(num * size);
+  return _mc_malloc(num * size, func, file, line);
 }
 
-void mc_free( void * ptr ) {
+char *_mc_strdup( const char * s, const char *func, const char *file, int line ) {
+  mc_check_init();
+  char *ss=_mc_malloc(strlen(s)+1, func, file, line);
+  strcpy(ss,s);
+  return ss;
+}
+
+void _mc_free( void * ptr, const char *func, const char *file, int line  ) {
   mc_check_init();
   mc_list_lock(MEMLIST);
   mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
@@ -78,7 +94,7 @@ void mc_free( void * ptr ) {
   }
 
   if (e == NULL) {
-    log_error2("free of pointer %p: not in list, double free!",ptr);
+    log_error4("free of pointer %s, %s, %d: not in list, double free!",func,file,line);
   } else {
     mc_list_drop_iter(MEMLIST);
   }
@@ -94,6 +110,7 @@ void mc_report(void) {
   while (e != NULL) {
     count += 1;
     total += e->size;
+    log_error4("not freed: pointer allocated at %s, %s, %d",e->func,e->file,e->line);
     e = mc_list_next_iter(MEMLIST);
   }
 
@@ -107,5 +124,6 @@ void mc_report(void) {
 
 void mc_init(void) {
   MEMLIST = mc_list_new();
+  atexit(mc_report);
 }
 
