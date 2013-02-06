@@ -4,8 +4,8 @@ VERSION=0.1
 CC=cc
 CFLAGS=-c -O2
 
-all: btree.o list.o log.o crc.o hash.o
-	ar rv libelementals.a btree.o list.o log.o crc.o hash.o
+all: btree.o list.o log.o crc.o hash.o memcheck.o
+	ar rv libelementals.a btree.o list.o log.o crc.o hash.o memcheck.o
 	ranlib libelementals.a
 
 btree.o: btree.c btree.h log.o
@@ -23,6 +23,9 @@ crc.o: crc.c crc.h
 
 hash.o: hash.c hash.h log.o
 	$(CC) $(CFLAGS) hash.c
+
+memcheck.o: memcheck.c memcheck.h log.o list.o
+	$(CC) $(CFLAGS) memcheck.c
 
 testlist: test_list.o all
 	$(CC) -o test_list test_list.c -L. -lelementals

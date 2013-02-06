@@ -90,4 +90,38 @@ void		  _list_move_iter(list_t *,list_pos_t pos);
   void     NAME##_lock(NAME *l) { _list_lock(l); } \
   void     NAME##_unlock(NAME *l) { _list_unlock(l); }
 
+#define STATIC_DECLARE_LIST(NAME,T) \
+  typedef list_t  NAME; \
+  static NAME * NAME##_new(); \
+  static void     NAME##_destroy(NAME *l); \
+  static int      NAME##_length(NAME *l); \
+  static int      NAME##_count(NAME *l); \
+  static T *      NAME##_start_iter(NAME *l,list_pos_t p); \
+  static T *      NAME##_next_iter(NAME *l); \
+  static T *      NAME##_prev_iter(NAME *l); \
+  static void     NAME##_drop_iter(NAME *l); \
+  static void     NAME##_prepend_iter(NAME *l,T *e); \
+  static void     NAME##_append_iter(NAME *l, T *e); \
+  static T *      NAME##_iter_at(NAME *l, int i); \
+  static void     NAME##_move_iter(NAME *l,list_pos_t pos); \
+  static void     NAME##_lock(NAME *l); \
+  static void     NAME##_unlock(NAME *l);
+
+#define STATIC_IMPLEMENT_LIST(NAME,T,COPY,DESTROY) \
+  static NAME * NAME##_new() { return _list_new(); } \
+  static void     NAME##_destroy(NAME *l) { _list_destroy(l,DESTROY); } \
+  static int      NAME##_length(NAME *l) { return _list_length(l); } \
+  static int      NAME##_count(NAME *l) { return _list_length(l); } \
+  static T *      NAME##_start_iter(NAME *l,list_pos_t p) { return (T *) _list_start_iter(l,p); } \
+  static T *      NAME##_next_iter(NAME *l) { return (T *) _list_next_iter(l); } \
+  static T *      NAME##_prev_iter(NAME *l) { return (T *) _list_prev_iter(l); } \
+  static void     NAME##_drop_iter(NAME *l) { _list_drop_iter(l,DESTROY); } \
+  static void     NAME##_prepend_iter(NAME *l,T *e) { _list_prepend_iter(l,COPY(e)); } \
+  static void     NAME##_append_iter(NAME *l, T *e) { _list_append_iter(l,COPY(e)); } \
+  static T *      NAME##_iter_at(NAME *l, int i) { return (T *) _list_iter_at(l,i); } \
+  static void     NAME##_move_iter(NAME *l,list_pos_t pos) { _list_move_iter(l,pos); } \
+  static void     NAME##_lock(NAME *l) { _list_lock(l); } \
+  static void     NAME##_unlock(NAME *l) { _list_unlock(l); }
+
+
 #endif
