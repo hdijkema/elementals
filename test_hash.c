@@ -5,7 +5,7 @@
 #include "memcheck.h"
 
 FILE *log_handle() {
-	return stderr;
+  return stderr;
 }
 
 int log_this_severity() {
@@ -14,27 +14,27 @@ int log_this_severity() {
 
 hash_data_t int_copy(int *e) {
     //log_debug("copy");
-	int *ee=(int *) mc_malloc(sizeof(int));
-	*ee=*e;
-	return (hash_data_t) ee;
+  int *ee=(int *) mc_malloc(sizeof(int));
+  *ee=*e;
+  return (hash_data_t) ee;
 }
 
 void int_destroy(hash_data_t e) {
-	int *ee=(int *) e;
-	mc_free(ee);
+  int *ee=(int *) e;
+  mc_free(ee);
 }
 
 DECLARE_HASH(ihash,int);
 IMPLEMENT_HASH(ihash,int,int_copy,int_destroy);
 
 void phash(ihash *h) {
-	printf("phash[%d,%d]: ",ihash_count(h),ihash_table_size(h));fflush(stdout);
-	hash_iter_t it=ihash_iter(h);
-	while (!hash_iter_end(it)) {
-	    printf("%s (%d), ",hash_iter_key(it),hash_iter_index(it));
-	    it=hash_iter_next(it);
-	}
-	printf("\n");
+  printf("phash[%d,%d]: ",ihash_count(h),ihash_table_size(h));fflush(stdout);
+  hash_iter_t it=ihash_iter(h);
+  while (!hash_iter_end(it)) {
+      printf("%s (%d), ",hash_iter_key(it),hash_iter_index(it));
+      it=hash_iter_next(it);
+  }
+  printf("\n");
 }
 
 #define TEST(name,code,h) \

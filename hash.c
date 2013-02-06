@@ -28,12 +28,12 @@ static int next_prime(int n) {
 
 static void phash(hash_t *h) {
     printf("phash[%d,%d,%.2lf]: ",hash_count(h),hash_table_size(h),hash_collision_stat(h));fflush(stdout);
-	hash_iter_t it=hash_iter(h);
-	while (!hash_iter_end(it)) {
-	    printf("%s (%d), ",hash_iter_key(it),hash_iter_index(it));
-	    it=hash_iter_next(it);
-	}
-	printf("\n");
+  hash_iter_t it=hash_iter(h);
+  while (!hash_iter_end(it)) {
+      printf("%s (%d), ",hash_iter_key(it),hash_iter_index(it));
+      it=hash_iter_next(it);
+  }
+  printf("\n");
 }
 
 /******************************************************************/

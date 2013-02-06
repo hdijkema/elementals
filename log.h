@@ -32,21 +32,21 @@
 #define LOG_FATAL 10
 
 #define log_severity(s) ((s==LOG_DEBUG) ? "debug" : \
-							((s==LOG_INFO) ? "info  " : \
-								((s==LOG_ERROR) ? "error" : \
-									((s==LOG_FATAL) ? "fatal" : \
-										((s==LOG_FCALL) ? "fcall" : "unknown") \
-											) \
-												) \
-													) \
-														)
+              ((s==LOG_INFO) ? "info  " : \
+                ((s==LOG_ERROR) ? "error" : \
+                  ((s==LOG_FATAL) ? "fatal" : \
+                    ((s==LOG_FCALL) ? "fcall" : "unknown") \
+                      ) \
+                        ) \
+                          ) \
+                            )
 
 
 FILE * log_handle();
 void reset_log_handle_to_space(const char *space);
 inline int log_this_severity();
 
-#define log_flush()	fseek(log_handle(),0,SEEK_END)
+#define log_flush() fseek(log_handle(),0,SEEK_END)
 
 #define log_imsg(severity,code) \
     ((log_this_severity(severity)) ? \
@@ -103,7 +103,7 @@ inline int log_this_severity();
 
 #define cond_log_error2(cond,template,msg) if (cond) { log_error2(template,msg); }
 
-#define log_return(v)		return (log_debug2("return value=%d",v),v)
-#define log_return_st(v)	return (log_debug2("return value=%ld",v),v)
+#define log_return(v)   return (log_debug2("return value=%d",v),v)
+#define log_return_st(v)  return (log_debug2("return value=%ld",v),v)
 
 #endif

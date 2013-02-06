@@ -35,17 +35,17 @@
 typedef void * list_data_t;
 
 typedef struct __list_entry__ {
-	struct __list_entry__ *next;
-	struct __list_entry__ *previous;
-	void * data;
+  struct __list_entry__ *next;
+  struct __list_entry__ *previous;
+  void * data;
 } list_entry_t;
 
 typedef struct {
-	pthread_mutex_t *mutex;
-	list_entry_t    *first;
-	list_entry_t    *last;
-	list_entry_t    *current;
-	int count;
+  pthread_mutex_t *mutex;
+  list_entry_t    *first;
+  list_entry_t    *last;
+  list_entry_t    *current;
+  int count;
 } list_t;
 
 typedef enum { LIST_LAST, LIST_FIRST } list_pos_t;
@@ -64,7 +64,7 @@ stat list_data_t _list_prev_iter(list_t *);
 stat void         _list_drop_iter(list_t *,void (*data_destroyer)(list_data_t v));
 stat void         _list_prepend_iter(list_t *,list_data_t data);
 stat void         _list_append_iter(list_t *,list_data_t data);
-stat void		  _list_move_iter(list_t *,list_pos_t pos);
+stat void     _list_move_iter(list_t *,list_pos_t pos);
 
 #define DECLARE_LIST(NAME,T) \
   typedef list_t  NAME; \

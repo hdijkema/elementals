@@ -13,10 +13,10 @@ struct __hash_elem__ {
 
 typedef struct {
     struct __hash_elem__ *table;
-	int    		     table_size;
-	int    		     count;
-	int (*eq)(const char *k1,const char *k2);
-	pthread_mutex_t *mutex;
+  int            table_size;
+  int            count;
+  int (*eq)(const char *k1,const char *k2);
+  pthread_mutex_t *mutex;
 } hash_t;
 
 typedef struct {
