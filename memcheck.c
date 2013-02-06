@@ -1,8 +1,18 @@
 #define USE_MEMCHECK
 
-#include "memcheck.h"
+#define MEMCHECK_INTERNAL
 #include "list.h"
 #include "log.h"
+#include "list.c"
+
+#undef mc_malloc
+#undef mc_realloc
+#undef mc_calloc
+#undef mc_free
+#undef mc_take_over
+#undef mc_take_control
+#undef mc_init
+#undef mc_report
 
 typedef struct {
   size_t  size;

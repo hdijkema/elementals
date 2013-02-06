@@ -7,6 +7,8 @@
 #include <string.h>
 #include <malloc.h>
 
+#include "memcheck.h"
+
 /******************************************************************/
 
 static int is_prime(int n) {
@@ -51,7 +53,7 @@ static int check_resize(hash_t *h,void (*data_destroyer)(hash_data_t)) {
         struct __hash_elem__ *table=h->table;
 
         int nn=next_prime(N*2);
-        h->table=(struct __hash_elem__ *) malloc(sizeof(struct __hash_elem__)*nn);
+        h->table=(struct __hash_elem__ *) mc_malloc(sizeof(struct __hash_elem__)*nn);
         int i;
         for(i=0;i<nn;i++) { h->table[i].count=0;h->table[i].keys=NULL;h->table[i].data=NULL; }
         h->count=0;
@@ -63,12 +65,12 @@ static int check_resize(hash_t *h,void (*data_destroyer)(hash_data_t)) {
             int k;
             for(k=0;k<e->count;k++) {
                 hash_put1(h,e->keys[k],e->data[k],data_destroyer);
-                free(e->keys[k]);
+                mc_free(e->keys[k]);
             }
-            free(e->keys);
-            free(e->data);
+            mc_free(e->keys);
+            mc_free(e->data);
         }
-        free(table);
+        mc_free(table);
 
         //phash(h);
 
@@ -93,17 +95,17 @@ static int eq_case_insensitive(const char *k1,const char *k2) {
 /******************************************************************/
 
 hash_t *hash_new(int initial_table_size,int case_sensitive) {
-    hash_t *h=(hash_t *) malloc(sizeof(hash_t));
+    hash_t *h=(hash_t *) mc_malloc(sizeof(hash_t));
     if (h!=NULL) {
 
         int N=next_prime((initial_table_size<10) ? 10 : initial_table_size);
-        h->table=(struct __hash_elem__ *) malloc(sizeof(struct __hash_elem__)*N);
+        h->table=(struct __hash_elem__ *) mc_malloc(sizeof(struct __hash_elem__)*N);
         int i;
         for(i=0;i<N;i++) { h->table[i].count=0;h->table[i].keys=NULL;h->table[i].data=NULL; }
         h->count=0;
         h->table_size=N;
 
-        h->mutex=(pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
+        h->mutex=(pthread_mutex_t *) mc_malloc(sizeof(pthread_mutex_t));
         h->eq=(case_sensitive) ? eq_case_sensitive : eq_case_insensitive;
         pthread_mutex_init(h->mutex,NULL);
         return h;
@@ -119,15 +121,16 @@ void hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
         struct __hash_elem__  *e=&h->table[i];
         int j;
         for(j=0;j<e->count;j++) {
-            free(e->keys[j]);
+            mc_free(e->keys[j]);
             data_destroyer(e->data[j]);
         }
-        free(e->keys);
-        free(e->data);
+        mc_free(e->keys);
+        mc_free(e->data);
     }
     pthread_mutex_destroy(h->mutex);
-    free(h->table);
-    free(h);
+    mc_free(h->mutex);
+    mc_free(h->table);
+    mc_free(h);
 }
 
 void hash_put(hash_t *h,const char *key,hash_data_t data,void (*data_destroyer)(hash_data_t)) {
@@ -146,15 +149,15 @@ void hash_put1(hash_t *h,const char *key,hash_data_t data,void (*data_destroyer)
     for(i=0;i<e->count && !h->eq(e->keys[i],key);i++);
     if (i==e->count) {
         e->count+=1;
-        e->keys=(char **) realloc(e->keys,sizeof(char *)*e->count);
-        e->data=(hash_data_t *) realloc(e->data,sizeof(hash_data_t)*e->count);
-        e->keys[e->count-1]=strdup(key);
+        e->keys=(char **) mc_realloc(e->keys,sizeof(char *)*e->count);
+        e->data=(hash_data_t *) mc_realloc(e->data,sizeof(hash_data_t)*e->count);
+        e->keys[e->count-1]=mc_strdup(key);
         e->data[e->count-1]=data;
         h->count+=1;
     } else {
-        free(e->keys[i]);
+        mc_free(e->keys[i]);
         data_destroyer(e->data[i]);
-        e->keys[i]=strdup(key);
+        e->keys[i]=mc_strdup(key);
         e->data[i]=data;
     }
 
@@ -194,7 +197,7 @@ void hash_del(hash_t *h,const char *key,void (*data_destroyer)(hash_data_t)) {
     if (i==e->count) {
         // nothing to delete
     } else {
-        free(e->keys[i]);
+        mc_free(e->keys[i]);
         data_destroyer(e->data[i]);
         for(;i<e->count-1;i++) {
             e->keys[i]=e->keys[i+1];

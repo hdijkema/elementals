@@ -21,6 +21,15 @@
 #ifndef __LIST__HOD
 #define __LIST__HOD
 
+#ifndef MEMCHECK_INTERNAL
+  #define stat
+#else
+  #define stat static
+  #ifdef USE_MEMCHECK
+    #undef USE_MEMCHECK
+  #endif
+#endif
+
 #include <pthread.h>
 
 typedef void * list_data_t;
@@ -41,21 +50,21 @@ typedef struct {
 
 typedef enum { LIST_LAST, LIST_FIRST } list_pos_t;
 
-list_t *  _list_new();
-void      _list_destroy(list_t *,void (*data_destroyer)(list_data_t v));
-int       _list_length(list_t *);
-void      _list_lock(list_t *);
-void      _list_unlock(list_t *);
+stat list_t *  _list_new();
+stat void      _list_destroy(list_t *,void (*data_destroyer)(list_data_t v));
+stat int       _list_length(list_t *);
+stat void      _list_lock(list_t *);
+stat void      _list_unlock(list_t *);
 
-list_data_t _list_start_iter(list_t *,list_pos_t pos);
-list_data_t _list_iter_at(list_t *,int i);
-list_data_t _list_next_iter(list_t *);
-list_data_t _list_prev_iter(list_t *);
+stat list_data_t _list_start_iter(list_t *,list_pos_t pos);
+stat list_data_t _list_iter_at(list_t *,int i);
+stat list_data_t _list_next_iter(list_t *);
+stat list_data_t _list_prev_iter(list_t *);
 
-void         _list_drop_iter(list_t *,void (*data_destroyer)(list_data_t v));
-void         _list_prepend_iter(list_t *,list_data_t data);
-void         _list_append_iter(list_t *,list_data_t data);
-void		  _list_move_iter(list_t *,list_pos_t pos);
+stat void         _list_drop_iter(list_t *,void (*data_destroyer)(list_data_t v));
+stat void         _list_prepend_iter(list_t *,list_data_t data);
+stat void         _list_append_iter(list_t *,list_data_t data);
+stat void		  _list_move_iter(list_t *,list_pos_t pos);
 
 #define DECLARE_LIST(NAME,T) \
   typedef list_t  NAME; \

@@ -2,21 +2,26 @@
 #include <stdio.h>
 #include <malloc.h>
 #include "log.h"
+#include "memcheck.h"
 
 FILE *log_handle() {
 	return stderr;
 }
 
+int log_this_severity() {
+  return 1;
+}
+
 hash_data_t int_copy(int *e) {
     //log_debug("copy");
-	int *ee=(int *) malloc(sizeof(int));
+	int *ee=(int *) mc_malloc(sizeof(int));
 	*ee=*e;
 	return (hash_data_t) ee;
 }
 
 void int_destroy(hash_data_t e) {
 	int *ee=(int *) e;
-	free(ee);
+	mc_free(ee);
 }
 
 DECLARE_HASH(ihash,int);
@@ -39,7 +44,7 @@ void phash(ihash *h) {
     phash(h);
 
 int main() {
-
+    mc_init();
     ihash *h=ihash_new(10,HASH_CASE_SENSITIVE);
 
     TEST(new,,h);
@@ -88,6 +93,7 @@ int main() {
          }
          ,h);
 
+    ihash_destroy(h);
 
     return 0;
 }
