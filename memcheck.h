@@ -9,13 +9,15 @@
   void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, int line );
   void *_mc_calloc( size_t num, size_t size, const char *func, const char *file, int line );
   char *_mc_strdup(const char *, const char *func, const char *file, int line );
-  void  mc_free( void * ptr, const char *func, const char *file, int line );
+  void  _mc_free( void * ptr, const char *func, const char *file, int line );
+  void  _mc_take_control( void * ptr, size_t size, const char *func, const char *file, int line);
 
   #define mc_malloc(s) _mc_malloc(s,__FUNCTION__,__FILE__,__LINE__)
   #define mc_realloc(p,s) _mc_realloc(p,s,__FUNCTION__,__FILE__,__LINE__)
   #define mc_calloc(n,s) _mc_calloc(n,s,__FUNCTION__,__FILE__,__LINE__)
   #define mc_strdup(s) _mc_strdup(s,__FUNCTION__,__FILE__,__LINE__)
   #define mc_free(p) _mc_free(p,__FUNCTION__,__FILE__,__LINE__)
+  #define mc_take_control(p,s) _mc_take_control(p,s,__FUNCTION__,__FILE__,__LINE__)
 
   void  mc_init(void);
   void  mc_report(void);

@@ -45,6 +45,20 @@ void *_mc_malloc( size_t size, const char *func, const char *file, int line ) {
   return p;
 }
 
+void _mc_take_control( void *ptr, size_t size, const char *func, const char *file, int line ) {
+  mc_check_init();
+  mc_entry_t *e=(mc_entry_t *) malloc(sizeof(mc_entry_t));
+  e->size=size;
+  e->func=func;
+  e->file=file;
+  e->line=line;
+  e->ptr=ptr;
+  mc_list_lock(MEMLIST);
+  mc_list_start_iter(MEMLIST,LIST_FIRST);
+  mc_list_prepend_iter(MEMLIST,e);
+  mc_list_unlock(MEMLIST);
+}
+
 void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, int line  ) {
   mc_check_init();
 
