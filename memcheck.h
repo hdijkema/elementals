@@ -19,7 +19,7 @@
   #define mc_strdup(s) _mc_strdup(s,__FUNCTION__,__FILE__,__LINE__)
   #define mc_free(p) _mc_free(p,__FUNCTION__,__FILE__,__LINE__)
   #define mc_take_control(p,s) _mc_take_control(p,s,__FUNCTION__,__FILE__,__LINE__)
-  #define mc_take_over(p) _mc_take_over(p,s,__FUNCTION__,__FILE__,__LINE__)
+  #define mc_take_over(p) _mc_take_over(p,__FUNCTION__,__FILE__,__LINE__)
 
   void  mc_init(void);
   void  mc_report(void);
