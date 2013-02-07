@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
 
-bin_PROGRAMS =  \
+check_bindir =  
+check_bin_PROGRAMS =  \
 	test_hash
 
 test_hash_SOURCES =  \

@@ -31,7 +31,11 @@ pkgconfig_DATA = elementals-0.1.pc
 EXTRA_DIST = \
 	elementals-0.1.pc.in
 
-SUBDIRS = \
-	elementals
-
-include_HEADERS = elementals.h
+include_HEADERS = elementals.h 
+	
+otherincludedir = $(includedir)/elementals
+otherinclude_HEADERS = elementals/hash.h \
+	elementals/crc.h \
+	elementals/list.h \
+	elementals/log.h \
+	elementals/memcheck.h
