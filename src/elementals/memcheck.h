@@ -20,7 +20,11 @@
 #ifndef MEMCHECK_H_INCLUDED
 #define MEMCHECK_H_INCLUDED
 
+#ifdef OSX
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
 #include <string.h>
 
 #ifdef USE_MEMCHECK
