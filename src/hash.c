@@ -24,6 +24,21 @@
 #include <elementals/memcheck.h>
 #include <string.h>
 
+static const char *copy_key(const char *e)
+{
+  return mc_strdup(e);
+}
+
+static void destroy_key(const char *e) {
+  mc_free((void *) e);
+}
+
+static int key_cmp(const char *a,const char *b) {
+  return strcmp(a,b);
+}
+
+IMPLEMENT_LIST(hash_key_list,const char,copy_key, destroy_key);
+
 /******************************************************************/
 
 static int is_prime(int n) {
@@ -137,7 +152,9 @@ void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
   int i,N;
   for(i=0,N=h->table_size;i<N;i++) {
     struct __hash_elem__  *e=&h->table[i];
-    if (e->count==1) {
+    if (e->count==0) {
+      // do nothing
+    } else if (e->count==1) {
       mc_free(e->kd.key);
       data_destroyer(e->kd.data);
     } else {
@@ -156,8 +173,8 @@ void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
   mc_free(h);
 }
 
-void _hash_put(hash_t *h, const char *key, hash_data_t data, 
-                            void (*data_destroyer)(hash_data_t)) 
+void _hash_put(hash_t *h, const char *key, hash_data_t data,
+                            void (*data_destroyer)(hash_data_t))
 {
     log_assert(h!=NULL);
     pthread_mutex_lock(h->mutex);
@@ -166,11 +183,11 @@ void _hash_put(hash_t *h, const char *key, hash_data_t data,
 }
 
 void hash_put1(hash_t *h,const char *key,hash_data_t data,
-                             void (*data_destroyer)(hash_data_t)) 
+                             void (*data_destroyer)(hash_data_t))
 {
 
 	check_resize (h, data_destroyer);
-				   
+
   int index=str_crc32(key) % h->table_size;
   struct __hash_elem__ *e = &h->table[index];
 
@@ -219,7 +236,7 @@ void hash_put1(hash_t *h,const char *key,hash_data_t data,
   INC(h->update_count);
 }
 
-hash_data_t _hash_get(hash_t *h, const char *key) 
+hash_data_t _hash_get(hash_t *h, const char *key)
 {
   log_assert(h!=NULL);
   pthread_mutex_lock(h->mutex);
@@ -228,7 +245,7 @@ hash_data_t _hash_get(hash_t *h, const char *key)
   struct __hash_elem__ *e=&h->table[index];
 
   hash_data_t result;
-  
+
   if (e->count == 0) {
     result = NULL;
   } else if (e->count == 1) {
@@ -252,7 +269,7 @@ hash_data_t _hash_get(hash_t *h, const char *key)
   return result;
 }
 
-void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t)) 
+void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
 {
   log_assert(h!=NULL);
   pthread_mutex_lock(h->mutex);
@@ -277,7 +294,7 @@ void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
     if (i == N) {
       // not found, cannot delete
     } else {
-      
+
       mc_free(e->kds.keys[i]);
       data_destroyer(e->kds.datas[i]);
       for(N -= 1;i < N; ++i) {
@@ -287,10 +304,14 @@ void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
       e->count -= 1;
       h->count -= 1;
       h->collisions -= 1;
-      
+
       if (e->count == 1) {
-        e->kd.key = e->kds.keys[0];
-        e->kd.data = e->kds.datas[0];
+        char *k = e->kds.keys[0];
+        hash_data_t *d = e->kds.datas[0];
+        mc_free(e->kds.keys);
+        mc_free(e->kds.datas);
+        e->kd.key = k;
+        e->kd.data = d;
       }
     }
   }
@@ -298,7 +319,7 @@ void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
   INC(h->update_count);
 
   pthread_mutex_unlock(h->mutex);
-} 
+}
 
 int _hash_exists(hash_t *hash,const char *key) {
   log_assert(hash != NULL);
@@ -308,7 +329,7 @@ int _hash_exists(hash_t *hash,const char *key) {
 hash_iter_t _hash_iter(hash_t *hash) {
   log_assert(hash != NULL);
   pthread_mutex_lock(hash->mutex);
-  
+
   int i,N;
   hash_iter_t iter;
   for(i=0,N=hash->table_size;i<N && hash->table[i].count==0;++i);
@@ -330,7 +351,7 @@ hash_iter_t _hash_iter(hash_t *hash) {
 }
 
 int _hash_iter_end(hash_iter_t it) {
-  if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); } 
+  if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   return it.key==NULL;
 }
 
@@ -351,7 +372,7 @@ void _hash_iter_set_data(hash_iter_t it, hash_data_t d, void (*destroyer) (hash_
   destroyer(it.data);
   struct __hash_elem__ *e=&h->table[it.index];
   if (e->count == 1 && it.eindex == 0) {
-    e->kd.data = d; 
+    e->kd.data = d;
   } else {
     e->kds.datas[it.eindex] = d;
   }
@@ -362,7 +383,7 @@ hash_iter_t _hash_iter_next(hash_iter_t it) {
   if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   hash_t *h=it.hash;
   pthread_mutex_lock(h->mutex);
-  
+
   struct __hash_elem__ *e=&h->table[it.index];
   it.eindex += 1;
   hash_iter_t iter;
@@ -391,5 +412,29 @@ hash_iter_t _hash_iter_next(hash_iter_t it) {
   }
   pthread_mutex_unlock(h->mutex);
   return iter;
+}
+
+hash_key_list *_hash_keys(hash_t *h) {
+  pthread_mutex_lock(h->mutex);
+  hash_key_list *l=hash_key_list_new();
+  int i,N;
+  hash_key_list_start_iter(l,LIST_LAST);
+  for(i=0,N=h->table_size;i<N;++i) {
+    struct __hash_elem__ *e=&h->table[i];
+    if (e->count==1) {
+      hash_key_list_append_iter(l,e->kd.key);
+    } else if (e->count>1) {
+      int j;
+      for(j=0;j<e->count;j++) {
+        hash_key_list_append_iter(l,e->kds.keys[j]);
+      }
+    }
+  }
+  pthread_mutex_unlock(h->mutex);
+  return l;
+}
+
+hash_key_cmp _hash_key_cmp(hash_t *h) {
+  return key_cmp;
 }
 

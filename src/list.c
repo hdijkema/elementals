@@ -302,3 +302,104 @@ stat void _list_move_iter(list_t *l,list_pos_t pos) {
   }
 }
 
+static inline void swap_data(list_t *l, list_entry_t *a, list_entry_t *b) 
+{
+  void *d = a->data;
+  a->data = b->data;
+  b->data = d;
+}
+
+#define SWAP(a,b) { void *h=a; a=b; b=h; }
+
+static void sort_part(list_t *l, int (cmp)(list_data_t a,list_data_t b), 
+                              list_entry_t *start, list_entry_t *end, 
+                              int n_elems)
+{
+  if (start == end) {
+    // we've reached the bottom
+    return; 
+  } else {
+    if (start->next == end) { // sort tuple
+      int r = cmp(start->data, end->data);
+      if (r > 0) { 
+        swap_data(l, start, end);
+      }
+    } else if (start->next->next == end) { // sort triple a, b, c
+      void *a = start->data;
+      void *b = start->next->data;
+      void *c = end->data;
+
+      int b_gt_c = (cmp(b,c)>0);      
+      if (b_gt_c) { 
+        SWAP(b,c);  // a , b > c -> a c b 
+      } 
+
+      int a_gt_c = (cmp(a,c)>0);  // a, b, c -> a b < c
+      if (a_gt_c) { 
+        SWAP(a,b);SWAP(b,c); // a < b < c 
+      } else {
+        int a_gt_b = (cmp(a,b)>0);
+        if (a_gt_b) { 
+          SWAP(a,b);
+        }
+      }
+
+      start->data = a;
+      start->next->data = b;
+      end->data = c;
+    } else { 
+      // partition and merge sorted partitions
+
+      // partition
+      int N=n_elems/2;
+      list_entry_t *mid = start;
+      int i;
+      for(i=1; i<N; ++i) {
+        mid = mid->next;
+      }
+      sort_part(l, cmp, start, mid, N);
+      sort_part(l, cmp, mid->next, end, n_elems-N);
+
+      // merge
+      {
+        list_data_t *merge_table = (list_data_t *) mc_malloc(sizeof(list_data_t) * n_elems);
+        int i=0;
+        list_entry_t *s = start;      // part 1
+        list_entry_t *e = mid->next;  // part 2
+        while (e != end->next && s != mid->next) {
+          if ( cmp(s->data, e->data) <= 0) {
+            merge_table[i++] = s->data;
+            s = s->next;
+          } else {
+            merge_table[i++] = e->data;
+            e = e->next;
+          }
+        }
+        if (e == end->next) {
+          while (s != mid->next) {
+            merge_table[i++] = s->data;
+            s = s->next;
+          }
+        } else if (s == mid->next) {
+          while (e != end->next) {
+            merge_table[i++] = e->data;
+            e = e->next;
+          }
+        }
+        s = start;
+        for (i=0; i < n_elems; ++i) {
+          s->data = merge_table[i];
+          s = s->next;
+        }
+        mc_free(merge_table);
+      }
+      
+    }
+  }
+}
+
+stat void _list_sort(list_t *l,int (*cmp)(list_data_t a,list_data_t b))
+{
+  sort_part(l, cmp, l->first, l->last, l->count);
+}
+

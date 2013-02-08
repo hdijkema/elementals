@@ -20,6 +20,8 @@
 #include <elementals.h>
 #include <stdio.h>
 
+#include "../src/hash.c"
+
 FILE *log_handle() {
   return stderr;
 }
@@ -55,6 +57,23 @@ void phash(ihash *h) {
               ihash_count(h), ihash_collisions(h), ihash_table_size(h) );
 }
 
+void plist(hash_key_list *l) {
+  printf("plist[%d]: -> ",hash_key_list_count(l));
+  const char *e=hash_key_list_start_iter(l,LIST_FIRST);
+  while(e!=NULL) {
+    printf("%s ",e);fflush(stdout);
+    e=hash_key_list_next_iter(l);
+  }
+  printf("\n");
+  printf("plist[%d]: <- ",hash_key_list_count(l));
+  e=hash_key_list_start_iter(l,LIST_LAST);
+  while(e!=NULL) {
+    printf("%s ",e);fflush(stdout);
+    e=hash_key_list_prev_iter(l);
+  }
+  printf("\n");
+}
+
 #define TEST(name,code,h) \
     printf("%s: ",#name);fflush(stdout); \
     { code } \
@@ -87,7 +106,7 @@ int main() {
 
     TEST(del,ihash_del(h,key);,h);
 
-    TEST(putloop1,  
+    TEST(putloop1,
             for(i=3000;i<4020;i++) {
                 char I[20];
                 sprintf(I,"%03d",i);
@@ -95,7 +114,7 @@ int main() {
                 ihash_put(h,I,&k);
             }
         ,h);
-  
+
     TEST(del,ihash_del(h,key);,h);
 
     TEST(del0,
@@ -105,7 +124,7 @@ int main() {
              ihash_del(h,I);
          }
          ,h);
-  
+
 
     TEST(putloop2,
             for(i=100;i<200;i++) {
@@ -132,7 +151,24 @@ int main() {
          ,h);
 
     TEST(del1, ihash_del(h,"one");, h);
+
+    hash_key_list *l;
+    TEST(keys,
+         {
+           l=ihash_keys(h);
+           plist(l);
+         }
+        ,h);
+
+    TEST(skeys,
+         {
+           hash_key_list_sort(l,ihash_key_cmp(h));
+           plist(l);
+         }
+         ,h);
   
+    hash_key_list_destroy(l);
+
     ihash_destroy(h);
 
     return 0;

@@ -3,7 +3,8 @@
 
 check_bindir =  
 check_bin_PROGRAMS =  \
-	test_hash
+	test_hash \
+	test_list
 
 test_hash_SOURCES =  \
 	test_hash.c
@@ -16,8 +17,24 @@ test_hash_CFLAGS = -I../src \
 
 test_hash_CXXFLAGS = -I../src 
 
-test_hash_LDADD = -lelementals 
-
 test_hashEXTRA_DIST = ../src/libelementals.la 
 
-test_hash_LDFLAGS = -L../src 
+test_hash_LDFLAGS = ../src/memcheck.o \
+	../src/crc.o \
+	../src/list.o 
+
+test_hashEXTRA_DIST = ../src/memcheck.o \
+	../src/crc.o 
+
+test_hashEXTRA_DIST = ../src/memcheck.o 
+
+test_list_CFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_list_SOURCES =  \
+	test_list.c
+
+test_list_CPPFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_list_LDFLAGS = ../src/memcheck.o 

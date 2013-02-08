@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_bin_PROGRAMS = test_hash$(EXEEXT)
+check_bin_PROGRAMS = test_hash$(EXEEXT) test_list$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -49,13 +49,19 @@ am__installdirs = "$(DESTDIR)$(check_bindir)"
 PROGRAMS = $(check_bin_PROGRAMS)
 am_test_hash_OBJECTS = test_hash-test_hash.$(OBJEXT)
 test_hash_OBJECTS = $(am_test_hash_OBJECTS)
-test_hash_DEPENDENCIES =
+test_hash_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 test_hash_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_hash_CFLAGS) \
 	$(CFLAGS) $(test_hash_LDFLAGS) $(LDFLAGS) -o $@
+am_test_list_OBJECTS = test_list-test_list.$(OBJEXT)
+test_list_OBJECTS = $(am_test_list_OBJECTS)
+test_list_LDADD = $(LDADD)
+test_list_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(test_list_CFLAGS) \
+	$(CFLAGS) $(test_list_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -82,8 +88,8 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(test_hash_SOURCES)
-DIST_SOURCES = $(test_hash_SOURCES)
+SOURCES = $(test_hash_SOURCES) $(test_list_SOURCES)
+DIST_SOURCES = $(test_hash_SOURCES) $(test_list_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -241,9 +247,21 @@ test_hash_CFLAGS = -I../src \
 	-DUSE_MEMCHECK 
 
 test_hash_CXXFLAGS = -I../src 
-test_hash_LDADD = -lelementals 
-test_hashEXTRA_DIST = ../src/libelementals.la 
-test_hash_LDFLAGS = -L../src 
+test_hashEXTRA_DIST = ../src/memcheck.o 
+test_hash_LDFLAGS = ../src/memcheck.o \
+	../src/crc.o \
+	../src/list.o 
+
+test_list_CFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_list_SOURCES = \
+	test_list.c
+
+test_list_CPPFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_list_LDFLAGS = ../src/memcheck.o 
 all: all-am
 
 .SUFFIXES:
@@ -324,6 +342,9 @@ clean-check_binPROGRAMS:
 test_hash$(EXEEXT): $(test_hash_OBJECTS) $(test_hash_DEPENDENCIES) $(EXTRA_test_hash_DEPENDENCIES) 
 	@rm -f test_hash$(EXEEXT)
 	$(AM_V_CCLD)$(test_hash_LINK) $(test_hash_OBJECTS) $(test_hash_LDADD) $(LIBS)
+test_list$(EXEEXT): $(test_list_OBJECTS) $(test_list_DEPENDENCIES) $(EXTRA_test_list_DEPENDENCIES) 
+	@rm -f test_list$(EXEEXT)
+	$(AM_V_CCLD)$(test_list_LINK) $(test_list_OBJECTS) $(test_list_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -332,6 +353,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_hash-test_hash.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_list-test_list.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -367,6 +389,20 @@ test_hash-test_hash.obj: test_hash.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_hash.c' object='test_hash-test_hash.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_hash_CPPFLAGS) $(CPPFLAGS) $(test_hash_CFLAGS) $(CFLAGS) -c -o test_hash-test_hash.obj `if test -f 'test_hash.c'; then $(CYGPATH_W) 'test_hash.c'; else $(CYGPATH_W) '$(srcdir)/test_hash.c'; fi`
+
+test_list-test_list.o: test_list.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_list_CPPFLAGS) $(CPPFLAGS) $(test_list_CFLAGS) $(CFLAGS) -MT test_list-test_list.o -MD -MP -MF $(DEPDIR)/test_list-test_list.Tpo -c -o test_list-test_list.o `test -f 'test_list.c' || echo '$(srcdir)/'`test_list.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_list-test_list.Tpo $(DEPDIR)/test_list-test_list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_list.c' object='test_list-test_list.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_list_CPPFLAGS) $(CPPFLAGS) $(test_list_CFLAGS) $(CFLAGS) -c -o test_list-test_list.o `test -f 'test_list.c' || echo '$(srcdir)/'`test_list.c
+
+test_list-test_list.obj: test_list.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_list_CPPFLAGS) $(CPPFLAGS) $(test_list_CFLAGS) $(CFLAGS) -MT test_list-test_list.obj -MD -MP -MF $(DEPDIR)/test_list-test_list.Tpo -c -o test_list-test_list.obj `if test -f 'test_list.c'; then $(CYGPATH_W) 'test_list.c'; else $(CYGPATH_W) '$(srcdir)/test_list.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_list-test_list.Tpo $(DEPDIR)/test_list-test_list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_list.c' object='test_list-test_list.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_list_CPPFLAGS) $(CPPFLAGS) $(test_list_CFLAGS) $(CFLAGS) -c -o test_list-test_list.obj `if test -f 'test_list.c'; then $(CYGPATH_W) 'test_list.c'; else $(CYGPATH_W) '$(srcdir)/test_list.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

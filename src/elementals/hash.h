@@ -21,6 +21,7 @@
 #define _HASH_HOD_
 
 #include <pthread.h>
+#include <elementals/list.h>
 
 typedef void * hash_data_t;
 
@@ -60,6 +61,10 @@ typedef struct {
 #define HASH_CASE_SENSITIVE 1
 #define HASH_CASE_INSENSITIVE 0
 
+DECLARE_LIST(hash_key_list,const char);
+
+typedef int (*hash_key_cmp)(const char *, const char *);
+
 hash_t *    _hash_new(int initial_table_size, int case_sensitive);
 void        _hash_destroy(hash_t *hash, void (*data_destroyer)(hash_data_t));
 
@@ -78,40 +83,48 @@ void        _hash_iter_set_data(hash_iter_t it, hash_data_t data, void (*data_de
 int         _hash_count(hash_t *hash);
 int         _hash_collisions(hash_t *hash);
 
+hash_key_list * _hash_keys(hash_t *hash);
+hash_key_cmp    _hash_key_cmp();
+
+
 #define __DECLARE_HASH(MODIFIER,NAME,T) \
   typedef hash_t  NAME; \
-  MODIFIER NAME *        NAME##_new(int size,int case_sensitive); \
-  MODIFIER void          NAME##_destroy(NAME *h); \
-  MODIFIER void          NAME##_put(NAME *h,const char *key,T *e); \
-  MODIFIER void          NAME##_del(NAME *h,const char *key); \
-  MODIFIER T *           NAME##_get(NAME *h,const char *key); \
-  MODIFIER int           NAME##_exists(NAME *h,const char *key); \
-  MODIFIER hash_iter_t   NAME##_iter(NAME *h); \
-  MODIFIER hash_iter_t   NAME##_iter_next(hash_iter_t it); \
-  MODIFIER const char *  NAME##_iter_key(hash_iter_t it); \
-  MODIFIER T *           NAME##_iter_data(hash_iter_t it); \
-  MODIFIER void          NAME##_iter_set_data(hash_iter_t it, T * data); \
-  MODIFIER int           NAME##_iter_end(hash_iter_t it); \
-  MODIFIER int           NAME##_count(NAME *h); \
-  MODIFIER int           NAME##_table_size(NAME *h); \
-  MODIFIER int           NAME##_collisions(NAME *h); 
+  MODIFIER inline NAME *          NAME##_new(int size,int case_sensitive); \
+  MODIFIER inline void            NAME##_destroy(NAME *h); \
+  MODIFIER inline void            NAME##_put(NAME *h,const char *key,T *e); \
+  MODIFIER inline void            NAME##_del(NAME *h,const char *key); \
+  MODIFIER inline T *             NAME##_get(NAME *h,const char *key); \
+  MODIFIER inline int             NAME##_exists(NAME *h,const char *key); \
+  MODIFIER inline hash_key_list * NAME##_keys(NAME *h); \
+  MODIFIER inline hash_key_cmp    NAME##_key_cmp(NAME *h); \
+  MODIFIER inline hash_iter_t     NAME##_iter(NAME *h); \
+  MODIFIER inline hash_iter_t     NAME##_iter_next(hash_iter_t it); \
+  MODIFIER inline const char *    NAME##_iter_key(hash_iter_t it); \
+  MODIFIER inline T *             NAME##_iter_data(hash_iter_t it); \
+  MODIFIER inline void            NAME##_iter_set_data(hash_iter_t it, T * data); \
+  MODIFIER inline int             NAME##_iter_end(hash_iter_t it); \
+  MODIFIER inline int             NAME##_count(NAME *h); \
+  MODIFIER inline int             NAME##_table_size(NAME *h); \
+  MODIFIER inline int             NAME##_collisions(NAME *h);
 
 #define __IMPLEMENT_HASH(MODIFIER,NAME,T,COPY,DESTROY) \
-  MODIFIER inline NAME *        NAME##_new(int size, int case_sensitive) { return (NAME *) _hash_new(size,case_sensitive); } \
-  MODIFIER inline void          NAME##_destroy(NAME *h) { _hash_destroy((hash_t *) h, DESTROY); } \
-  MODIFIER inline void          NAME##_put(NAME *h, const char *key,T *e) { _hash_put((hash_t *) h,key,COPY(e), DESTROY); } \
-  MODIFIER inline void          NAME##_del(NAME *h, const char *key) { _hash_del((hash_t *) h,key, DESTROY); } \
-  MODIFIER inline T *           NAME##_get(NAME *h, const char *key) { return (T *) _hash_get((hash_t *) h, key); } \
-  MODIFIER inline int           NAME##_exists(NAME *h, const char *key) { return _hash_exists((hash_t *) h, key); } \
-  MODIFIER inline hash_iter_t   NAME##_iter(NAME *h) { return _hash_iter((hash_t *) h); } \
-  MODIFIER inline hash_iter_t   NAME##_iter_next(hash_iter_t it) { return _hash_iter_next(it); } \
-  MODIFIER inline int           NAME##_iter_end(hash_iter_t it) { return _hash_iter_end(it); } \
-  MODIFIER inline const char *  NAME##_iter_key(hash_iter_t it) { return _hash_iter_key(it); } \
-  MODIFIER inline T *           NAME##_iter_data(hash_iter_t it) { return (T *) _hash_iter_data(it); } \
-  MODIFIER inline void          NAME##_iter_set_data(hash_iter_t it, T * e) { _hash_iter_set_data(it, COPY(e), DESTROY); } \
-  MODIFIER inline int           NAME##_count(NAME *h) { return _hash_count((hash_t *) h); } \
-  MODIFIER inline int           NAME##_table_size(NAME *h) { return _hash_table_size((hash_t *) h); } \
-  MODIFIER inline int           NAME##_collisions(NAME *h) { return _hash_collisions((hash_t *) h); } 
+  MODIFIER inline NAME *          NAME##_new(int size, int case_sensitive) { return (NAME *) _hash_new(size,case_sensitive); } \
+  MODIFIER inline void            NAME##_destroy(NAME *h) { _hash_destroy((hash_t *) h, DESTROY); } \
+  MODIFIER inline void            NAME##_put(NAME *h, const char *key,T *e) { _hash_put((hash_t *) h,key,COPY(e), DESTROY); } \
+  MODIFIER inline void            NAME##_del(NAME *h, const char *key) { _hash_del((hash_t *) h,key, DESTROY); } \
+  MODIFIER inline T *             NAME##_get(NAME *h, const char *key) { return (T *) _hash_get((hash_t *) h, key); } \
+  MODIFIER inline int             NAME##_exists(NAME *h, const char *key) { return _hash_exists((hash_t *) h, key); } \
+  MODIFIER inline hash_key_list * NAME##_keys(NAME *h) { return _hash_keys((hash_t *) h); } \
+  MODIFIER inline hash_key_cmp    NAME##_key_cmp(NAME *h) { return _hash_key_cmp((hash_t *) h); } \
+  MODIFIER inline hash_iter_t     NAME##_iter(NAME *h) { return _hash_iter((hash_t *) h); } \
+  MODIFIER inline hash_iter_t     NAME##_iter_next(hash_iter_t it) { return _hash_iter_next(it); } \
+  MODIFIER inline int             NAME##_iter_end(hash_iter_t it) { return _hash_iter_end(it); } \
+  MODIFIER inline const char *    NAME##_iter_key(hash_iter_t it) { return _hash_iter_key(it); } \
+  MODIFIER inline T *             NAME##_iter_data(hash_iter_t it) { return (T *) _hash_iter_data(it); } \
+  MODIFIER inline void            NAME##_iter_set_data(hash_iter_t it, T * e) { _hash_iter_set_data(it, COPY(e), DESTROY); } \
+  MODIFIER inline int             NAME##_count(NAME *h) { return _hash_count((hash_t *) h); } \
+  MODIFIER inline int             NAME##_table_size(NAME *h) { return _hash_table_size((hash_t *) h); } \
+  MODIFIER inline int             NAME##_collisions(NAME *h) { return _hash_collisions((hash_t *) h); }
 
 #define DECLARE_HASH(NAME, T) __DECLARE_HASH( ,NAME, T)
 #define IMPLEMENT_HASH(NAME, T, COPY, DESTROY) __IMPLEMENT_HASH( ,NAME, T, COPY, DESTROY)

@@ -18,34 +18,57 @@
    ********************************************************************
 */
 
-#include <elementals.h>
-
-//#include "list.h"
+#include <elementals.h>  
 #include <stdio.h>
-//#include "memcheck.h"
-//#include "log.h"
 
-FILE *log_handle() {
+#include "../src/list.c"
+
+/************************************************************
+ * log support
+ ***********************************************************/
+
+FILE *log_handle() 
+{
   return stderr;
 }
 
-int log_this_severity() {
+int log_this_severity() 
+{
   return 1;
 }
 
-list_data_t int_copy(int *e) {
+/************************************************************
+ * list declaration
+ ***********************************************************/
+
+int * int_copy(int *e) 
+{
   int *ee=(int *) mc_malloc(sizeof(int));
   *ee=*e;
   return (list_data_t) ee;
 }
 
-void int_destroy(list_data_t e) {
+void int_destroy(int * e) 
+{
   int *ee=(int *) e;
   mc_free(ee);
 }
 
 DECLARE_LIST(ilist,int);
 IMPLEMENT_LIST(ilist,int,int_copy,int_destroy);
+
+/************************************************************
+ * testing
+ ***********************************************************/
+
+int int_reverse_cmp(int *a, int *b) 
+{
+  return ((*a>*b) ? -1 : ((*a<*b) ? 1 : 0));
+}
+
+int int_cmp(int *a, int *b) {
+  return ((*a<*b) ? -1 : ((*a>*b) ? 1 : 0));
+}
 
 void plist(ilist *l) {
   printf("plist[%d]: -> ",ilist_count(l));
@@ -166,6 +189,24 @@ int main() {
       ilist_append_iter(l,&i);
       ,l);
 
+  TEST(sort,
+      ilist_sort(l,int_cmp);
+    ,l);
+
+  TEST(revsort,
+      ilist_sort(l,int_reverse_cmp);
+    ,l);
+
+  TEST(t22,
+      ilist_start_iter(l,LIST_LAST);
+      i=8000;
+      ilist_prepend_iter(l,&i);
+      ,l);
+  
+  TEST(sort,
+      ilist_sort(l,int_cmp);
+    ,l);
+  
   TEST(t30,
       ilist_iter_at(l,4);
       ilist_move_iter(l,LIST_FIRST);

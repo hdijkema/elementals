@@ -55,6 +55,7 @@ stat void      _list_destroy(list_t *,void (*data_destroyer)(list_data_t v));
 stat int       _list_length(list_t *);
 stat void      _list_lock(list_t *);
 stat void      _list_unlock(list_t *);
+stat void      _list_sort(list_t *, int (*cmp) (list_data_t a, list_data_t b));
 
 stat list_data_t _list_start_iter(list_t *,list_pos_t pos);
 stat list_data_t _list_iter_at(list_t *,int i);
@@ -64,73 +65,51 @@ stat list_data_t _list_prev_iter(list_t *);
 stat void         _list_drop_iter(list_t *,void (*data_destroyer)(list_data_t v));
 stat void         _list_prepend_iter(list_t *,list_data_t data);
 stat void         _list_append_iter(list_t *,list_data_t data);
-stat void     _list_move_iter(list_t *,list_pos_t pos);
+stat void         _list_move_iter(list_t *,list_pos_t pos);
 
-#define DECLARE_LIST(NAME,T) \
+#define _DECLARE_LIST(MODIFIER, NAME,T) \
   typedef list_t  NAME; \
   NAME * NAME##_new(); \
-  void     NAME##_destroy(NAME *l); \
-  int      NAME##_length(NAME *l); \
-  int      NAME##_count(NAME *l); \
-  T *      NAME##_start_iter(NAME *l,list_pos_t p); \
-  T *      NAME##_next_iter(NAME *l); \
-  T *      NAME##_prev_iter(NAME *l); \
-  void     NAME##_drop_iter(NAME *l); \
-  void     NAME##_prepend_iter(NAME *l,T *e); \
-  void     NAME##_append_iter(NAME *l, T *e); \
-  T *      NAME##_iter_at(NAME *l, int i); \
-  void     NAME##_move_iter(NAME *l,list_pos_t pos); \
-  void     NAME##_lock(NAME *l); \
-  void     NAME##_unlock(NAME *l);
+  MODIFIER inline void     NAME##_destroy(NAME *l); \
+  MODIFIER inline int      NAME##_length(NAME *l); \
+  MODIFIER inline int      NAME##_count(NAME *l); \
+  MODIFIER inline void     NAME##_sort(NAME *l,int (*cmp)(T *a,T *b)); \
+  MODIFIER inline T *      NAME##_start_iter(NAME *l,list_pos_t p); \
+  MODIFIER inline T *      NAME##_next_iter(NAME *l); \
+  MODIFIER inline T *      NAME##_prev_iter(NAME *l); \
+  MODIFIER inline void     NAME##_drop_iter(NAME *l); \
+  MODIFIER inline void     NAME##_prepend_iter(NAME *l,T *e); \
+  MODIFIER inline void     NAME##_append_iter(NAME *l, T *e); \
+  MODIFIER inline T *      NAME##_iter_at(NAME *l, int i); \
+  MODIFIER inline void     NAME##_move_iter(NAME *l,list_pos_t pos); \
+  MODIFIER inline void     NAME##_lock(NAME *l); \
+  MODIFIER inline void     NAME##_unlock(NAME *l);
 
-#define IMPLEMENT_LIST(NAME,T,COPY,DESTROY) \
+#define _IMPLEMENT_LIST(MODIFIER, NAME, T, COPY, DESTROY) \
   NAME * NAME##_new() { return _list_new(); } \
-  void     NAME##_destroy(NAME *l) { _list_destroy(l,DESTROY); } \
-  int      NAME##_length(NAME *l) { return _list_length(l); } \
-  int      NAME##_count(NAME *l) { return _list_length(l); } \
-  T *      NAME##_start_iter(NAME *l,list_pos_t p) { return (T *) _list_start_iter(l,p); } \
-  T *      NAME##_next_iter(NAME *l) { return (T *) _list_next_iter(l); } \
-  T *      NAME##_prev_iter(NAME *l) { return (T *) _list_prev_iter(l); } \
-  void     NAME##_drop_iter(NAME *l) { _list_drop_iter(l,DESTROY); } \
-  void     NAME##_prepend_iter(NAME *l,T *e) { _list_prepend_iter(l,COPY(e)); } \
-  void     NAME##_append_iter(NAME *l, T *e) { _list_append_iter(l,COPY(e)); } \
-  T *      NAME##_iter_at(NAME *l, int i) { return (T *) _list_iter_at(l,i); } \
-  void     NAME##_move_iter(NAME *l,list_pos_t pos) { _list_move_iter(l,pos); } \
-  void     NAME##_lock(NAME *l) { _list_lock(l); } \
-  void     NAME##_unlock(NAME *l) { _list_unlock(l); }
+  MODIFIER inline void     NAME##_destroy(NAME *l) { _list_destroy(l,(void (*)(list_data_t)) DESTROY); } \
+  MODIFIER inline int      NAME##_length(NAME *l) { return _list_length(l); } \
+  MODIFIER inline int      NAME##_count(NAME *l) { return _list_length(l); } \
+  MODIFIER inline T *      NAME##_start_iter(NAME *l,list_pos_t p) { return (T *) _list_start_iter(l,p); } \
+  MODIFIER inline T *      NAME##_next_iter(NAME *l) { return (T *) _list_next_iter(l); } \
+  MODIFIER inline T *      NAME##_prev_iter(NAME *l) { return (T *) _list_prev_iter(l); } \
+  MODIFIER inline void     NAME##_sort(NAME *l, int (*cmp)(T *a,T *b)) { \
+                                    _list_sort(l, (int (*)(list_data_t,list_data_t)) cmp); \
+  } \
+  MODIFIER inline void     NAME##_drop_iter(NAME *l) { _list_drop_iter(l,(void (*)(list_data_t)) DESTROY); } \
+  MODIFIER inline void     NAME##_prepend_iter(NAME *l,T *e) { _list_prepend_iter(l,(list_data_t *) COPY(e)); } \
+  MODIFIER inline void     NAME##_append_iter(NAME *l, T *e) { _list_append_iter(l,(list_data_t *) COPY(e)); } \
+  MODIFIER inline T *      NAME##_iter_at(NAME *l, int i) { return (T *) _list_iter_at(l,i); } \
+  MODIFIER inline void     NAME##_move_iter(NAME *l,list_pos_t pos) { _list_move_iter(l,pos); } \
+  MODIFIER inline void     NAME##_lock(NAME *l) { _list_lock(l); } \
+  MODIFIER inline void     NAME##_unlock(NAME *l) { _list_unlock(l); }
 
-#define STATIC_DECLARE_LIST(NAME,T) \
-  typedef list_t  NAME; \
-  static NAME * NAME##_new(); \
-  static void     NAME##_destroy(NAME *l); \
-  static int      NAME##_length(NAME *l); \
-  static int      NAME##_count(NAME *l); \
-  static T *      NAME##_start_iter(NAME *l,list_pos_t p); \
-  static T *      NAME##_next_iter(NAME *l); \
-  static T *      NAME##_prev_iter(NAME *l); \
-  static void     NAME##_drop_iter(NAME *l); \
-  static void     NAME##_prepend_iter(NAME *l,T *e); \
-  static void     NAME##_append_iter(NAME *l, T *e); \
-  static T *      NAME##_iter_at(NAME *l, int i); \
-  static void     NAME##_move_iter(NAME *l,list_pos_t pos); \
-  static void     NAME##_lock(NAME *l); \
-  static void     NAME##_unlock(NAME *l);
 
-#define STATIC_IMPLEMENT_LIST(NAME,T,COPY,DESTROY) \
-  static NAME * NAME##_new() { return _list_new(); } \
-  static void     NAME##_destroy(NAME *l) { _list_destroy(l,DESTROY); } \
-  static int      NAME##_length(NAME *l) { return _list_length(l); } \
-  static int      NAME##_count(NAME *l) { return _list_length(l); } \
-  static T *      NAME##_start_iter(NAME *l,list_pos_t p) { return (T *) _list_start_iter(l,p); } \
-  static T *      NAME##_next_iter(NAME *l) { return (T *) _list_next_iter(l); } \
-  static T *      NAME##_prev_iter(NAME *l) { return (T *) _list_prev_iter(l); } \
-  static void     NAME##_drop_iter(NAME *l) { _list_drop_iter(l,DESTROY); } \
-  static void     NAME##_prepend_iter(NAME *l,T *e) { _list_prepend_iter(l,COPY(e)); } \
-  static void     NAME##_append_iter(NAME *l, T *e) { _list_append_iter(l,COPY(e)); } \
-  static T *      NAME##_iter_at(NAME *l, int i) { return (T *) _list_iter_at(l,i); } \
-  static void     NAME##_move_iter(NAME *l,list_pos_t pos) { _list_move_iter(l,pos); } \
-  static void     NAME##_lock(NAME *l) { _list_lock(l); } \
-  static void     NAME##_unlock(NAME *l) { _list_unlock(l); }
+#define DECLARE_LIST(NAME, T) _DECLARE_LIST( ,NAME, T)
+#define IMPLEMENT_LIST(NAME, T, COPY, DESTROY) _IMPLEMENT_LIST( ,NAME, T, COPY, DESTROY)
+
+#define STATIC_DECLARE_LIST(NAME, T) _DECLARE_LIST(static ,NAME, T)
+#define STATIC_IMPLEMENT_LIST(NAME, T, COPY, DESTROY) _IMPLEMENT_LIST(static ,NAME, T, COPY, DESTROY)
 
 
 #endif
