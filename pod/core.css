@@ -36,7 +36,7 @@
   color: #808080;
 }
 
-.spod PRE     {
+.spod PRE, PRE     {
   background: #eeeeee;
   border: 1px solid #888888;
   color: black;
@@ -44,20 +44,20 @@
   white-space: pre;
 }
 
-.spod H1      {
+.spod H1, H1      {
   background: transparent;
   color: #809000;
   font-size: x-large;
   text-indent: 0px;
 }
 
-.spod H2      {
+.spod H2, H2      {
   background: transparent;
   color: #008866;
   font-size: large;
 }
 
-.spod H3	{
+.spod H3, H3	{
   background: transparent;
   color: #000000;
   font-size: medium;

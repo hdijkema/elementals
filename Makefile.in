@@ -855,7 +855,7 @@ uninstall-local:
 	-rm -r $(elementalsdocdir)
 
 $(POD_HTML_FILES) : $(POD_FILES)
-	for p in $(POD_FILES); do h=`echo $$p | sed -e 's/.pod/.html/'`;spod2html --stylesheet=core.css $$p $$h;done
+	for p in $(POD_FILES); do h=`echo $$p | sed -e 's/.pod/.html/'`;SPOD=`which spod2html`;if [ "$SPOD" = "" ]; then pod2html --css core.css --infile $$p --outfile $$h; else spod2html --stylesheet=core.css $$p $$h; fi ;done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

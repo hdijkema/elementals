@@ -39,5 +39,5 @@ POD_HTML_FILES = pod/hash.html
 CLEANFILES = $(POD_HTML_FILES)
 
 $(POD_HTML_FILES) : $(POD_FILES)
-	for p in $(POD_FILES); do h=`echo $$p | sed -e 's/.pod/.html/'`;spod2html --stylesheet=core.css $$p $$h;done
+	for p in $(POD_FILES); do h=`echo $$p | sed -e 's/.pod/.html/'`;SPOD=`which spod2html`;if [ "$SPOD" = "" ]; then pod2html --css core.css --infile $$p --outfile $$h; else spod2html --stylesheet=core.css $$p $$h; fi ;done
 
