@@ -32,6 +32,7 @@ DISTCLEANFILES = intltool-extract \
 uninstall-local:
 	-rm -r $(elementalsdocdir)
 
+OS = $(shell uname)
 
 POD_FILES = pod/hash.pod
 POD_HTML_FILES = pod/hash.html
