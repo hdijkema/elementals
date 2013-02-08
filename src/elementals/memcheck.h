@@ -20,6 +20,7 @@
 #ifndef MEMCHECK_H_INCLUDED
 #define MEMCHECK_H_INCLUDED
 
+#include <elementals/os.h>
 #ifdef OSX
 #include <malloc/malloc.h>
 #else
