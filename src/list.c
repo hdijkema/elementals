@@ -302,7 +302,7 @@ stat void _list_move_iter(list_t *l,list_pos_t pos) {
   }
 }
 
-static inline void swap_data(list_t *l, list_entry_t *a, list_entry_t *b) 
+/*static inline void swap_data(list_t *l, list_entry_t *a, list_entry_t *b)
 {
   void *d = a->data;
   a->data = b->data;
@@ -360,54 +360,6 @@ static void sort_part(list_t *l, int (cmp)(list_data_t a,list_data_t b),
       sort_part(l, cmp, start, mid, N);
       sort_part(l, cmp, mid->next, end, n_elems-N);
 
-      int merge_type=0;
-      // merge
-      if (merge_type == 0) {
-        list_entry_t *s = start;    
-        list_entry_t *e = mid->next;
-        list_entry_t *stop = end->next;
-
-        while(e != stop && s != stop) { 
-          printf("(%d,%d) ",*(int *) s->data, *(int *) e->data);
-          // Note: end may be updated!
-          if (cmp(s->data, e->data) > 0) {
-            // insert e->data here.
-            list_entry_t *en, *ep, *sn, *sp;
-            en = e->next;
-            ep = e->previous;
-            sn = s->next;
-            sp = s->previous;
-            ep->next = en;
-            if (en == NULL) {
-              l->last=ep; 
-              ep->next = NULL;
-            } else {
-              en->previous=ep;
-            }
-            e = en;
-
-            if (sp == NULL) {
-              l->first = e;
-              sn->previous = NULL;
-            } else {
-              sp->next = e;
-            }
-            e->next = sn;
-            sn->previous = e;
-            s = sn;
-          } else {
-            s = s->next;
-          }
-        }
-        
-        printf("%d : ",n_elems);
-        s = start;
-        while (s->next != end->next) {
-          printf("%d ",*(int *) s->data);
-        }
-        printf("\n");
-        
-      } else if (merge_type == 1) {
         list_data_t *merge_table = (list_data_t *) mc_malloc(sizeof(list_data_t) * n_elems);
         int i=0;
         list_entry_t *s = start;      // part 1
@@ -438,14 +390,59 @@ static void sort_part(list_t *l, int (cmp)(list_data_t a,list_data_t b),
           s = s->next;
         }
         mc_free(merge_table);
-      }
       
     }
   }
-}
+}*/
+
 
 stat void _list_sort(list_t *l,int (*cmp)(list_data_t a,list_data_t b))
 {
-  sort_part(l, cmp, l->first, l->last, l->count);
+  //sort_part(l, cmp, l->first, l->last, l->count);
+  
+  int listSize=1,numMerges,leftSize,rightSize;
+  list_entry_t *tail, *left, *right, *next;
+  list_entry_t *list = l->first;
+  
+  if (list == NULL  || list->next == NULL) {
+    return;
+  }
+  
+  do { // For each power of two<=list length
+    numMerges=0,left=list;tail=list=0; // Start at the start
+    
+    while (left) { // Do this list_len/listSize times:
+      numMerges++,right=left,leftSize=0,rightSize=listSize;
+      // Cut list into two halves (but don't overrun)
+      while (right && leftSize<listSize) leftSize++,right=right->next;
+      // Run through the lists appending onto what we have so far.
+      while (leftSize>0 || (rightSize>0 && right)) {
+        // Left empty, take right OR Right empty, take left, OR compare.
+        if (!leftSize)                  {next=right;right=right->next;rightSize--;}
+        else if (!rightSize || !right)  {next=left;left=left->next;leftSize--;}
+        else if (compare(left->data,right->data)<0) {next=left;left=left->next;leftSize--;}
+        else                            {next=right;right=right->next;rightSize--;}
+        // Update pointers to keep track of where we are:
+        if (tail) tail->next=next;  else list=next;
+        // Sort prev pointer
+        tail=next;
+      }
+      // Right is now AFTER the list we just sorted, so start the next sort there.
+      left=right;
+    }
+    // Terminate the list, double the list-sort size.
+    tail->next=0,listSize<<=1;
+  } while (numMerges>1); // If we only did one merge, then we just sorted the whole list.
+  
+  // administrative update: One sweep to go
+  l->first = list;
+  list_entry_t *e = l->first;
+  e->previous=NULL;
+  while (e->next != NULL) {
+    e->next->previous = e;
+    e = e->next;
+  }
+  l->last = e;
+  l->current = l->first;
 }
 
