@@ -21,7 +21,7 @@
 #define MEMCHECK_H_INCLUDED
 
 #include <elementals/os.h>
-#ifdef OSX
+#ifdef EL_OSX
 #include <malloc/malloc.h>
 #else
 #include <malloc.h>

@@ -26,7 +26,7 @@ FILE *log_handle() {
   return stderr;
 }
 
-int log_this_severity() {
+int log_this_severity(int level) {
   return 1;
 }
 
