@@ -5,10 +5,10 @@ Geometry=1366x715+0+24
 
 [Project Manager]
 Shortcut=elementals//test//test_hash
-Expand=elementals%%%elementals//src%%%elementals//test%%%elementals//test//test_hash%%%elementals//test//test_list%%%elementals//elementalsdoc
+Expand=elementals%%%elementals//src%%%elementals//src//libelementals.la%%%elementals//test%%%elementals//test//test_hash%%%elementals//test//test_list%%%elementals//elementalsdoc
 
 [File Loader]
-Files=../../test/test_hash.c#171%%%../../test/test_list.c#6%%%../../src/elementals/memcheck.h#11%%%../../src/elementals/hash.h#62%%%../../src/hash.c#40%%%../../src/crc.c#20%%%../../src/list.c#25%%%../../src/memcheck.c#26%%%../../pod/hash.pod#10
+Files=../../test/test_hash.c#171%%%../../test/test_list.c#6%%%../../src/elementals/memcheck.h#11%%%../../src/elementals/hash.h#62%%%../../src/hash.c#38%%%../../src/crc.c#20%%%../../src/list.c#376%%%../../src/memcheck.c#26%%%../../pod/hash.pod#10
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

@@ -1,10 +1,10 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=4
+SUBVERSION=7
 PACKAGE=elementals
 DEPENDS=
 DEPENDS1=
-BUILDDEPENDS=automake,autoconf
+BUILDDEPENDS=automake,autoconf,intltool
 #DISTROS=natty oneiric precise quantal
 DISTROS=precise
 #DISTROS=precise

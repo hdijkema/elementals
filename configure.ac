@@ -17,7 +17,7 @@ AC_PROG_CC
 dnl ***************************************************************************
 dnl Internationalization
 dnl ***************************************************************************
-IT_PROG_INTLTOOL([0.35.0])
+#IT_PROG_INTLTOOL([0.35.0])
 
 GETTEXT_PACKAGE=elementals
 AC_SUBST(GETTEXT_PACKAGE)

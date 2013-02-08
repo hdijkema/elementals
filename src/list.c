@@ -360,8 +360,54 @@ static void sort_part(list_t *l, int (cmp)(list_data_t a,list_data_t b),
       sort_part(l, cmp, start, mid, N);
       sort_part(l, cmp, mid->next, end, n_elems-N);
 
+      int merge_type=0;
       // merge
-      {
+      if (merge_type == 0) {
+        list_entry_t *s = start;    
+        list_entry_t *e = mid->next;
+        list_entry_t *stop = end->next;
+
+        while(e != stop && s != stop) { 
+          printf("(%d,%d) ",*(int *) s->data, *(int *) e->data);
+          // Note: end may be updated!
+          if (cmp(s->data, e->data) > 0) {
+            // insert e->data here.
+            list_entry_t *en, *ep, *sn, *sp;
+            en = e->next;
+            ep = e->previous;
+            sn = s->next;
+            sp = s->previous;
+            ep->next = en;
+            if (en == NULL) {
+              l->last=ep; 
+              ep->next = NULL;
+            } else {
+              en->previous=ep;
+            }
+            e = en;
+
+            if (sp == NULL) {
+              l->first = e;
+              sn->previous = NULL;
+            } else {
+              sp->next = e;
+            }
+            e->next = sn;
+            sn->previous = e;
+            s = sn;
+          } else {
+            s = s->next;
+          }
+        }
+        
+        printf("%d : ",n_elems);
+        s = start;
+        while (s->next != end->next) {
+          printf("%d ",*(int *) s->data);
+        }
+        printf("\n");
+        
+      } else if (merge_type == 1) {
         list_data_t *merge_table = (list_data_t *) mc_malloc(sizeof(list_data_t) * n_elems);
         int i=0;
         list_entry_t *s = start;      // part 1
