@@ -285,7 +285,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = src test
+SUBDIRS = src test pod
 elementalsdocdir = ${prefix}/doc/elementals
 elementalsdoc_DATA = \
 	README\
@@ -293,7 +293,9 @@ elementalsdoc_DATA = \
 	AUTHORS\
 	ChangeLog\
 	INSTALL\
-	NEWS
+	NEWS\
+	pod/core.css \
+	$(POD_HTML_FILES)
 
 INTLTOOL_FILES = intltool-extract.in \
 	intltool-merge.in \
@@ -307,6 +309,9 @@ DISTCLEANFILES = intltool-extract \
 	intltool-update \
 	po/.intltool-merge-cache
 
+POD_FILES = pod/hash.pod
+POD_HTML_FILES = pod/hash.html
+CLEANFILES = $(POD_HTML_FILES)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -743,6 +748,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -847,6 +853,9 @@ uninstall-am: uninstall-elementalsdocDATA uninstall-local
 # Remove doc directory on uninstall
 uninstall-local:
 	-rm -r $(elementalsdocdir)
+
+$(POD_HTML_FILES) : $(POD_FILES)
+	for p in $(POD_FILES); do h=`echo $$p | sed -e 's/.pod/.html/'`;spod2html --stylesheet=core.css $$p $$h;done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

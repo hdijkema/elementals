@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## Created by Anjuta
 
-SUBDIRS = src test
+SUBDIRS = src test pod
 
 elementalsdocdir = ${prefix}/doc/elementals
 elementalsdoc_DATA = \
@@ -10,7 +10,9 @@ elementalsdoc_DATA = \
 	AUTHORS\
 	ChangeLog\
 	INSTALL\
-	NEWS
+	NEWS\
+	pod/core.css \
+	$(POD_HTML_FILES)
 
 
 INTLTOOL_FILES = intltool-extract.in \
@@ -29,3 +31,13 @@ DISTCLEANFILES = intltool-extract \
 # Remove doc directory on uninstall
 uninstall-local:
 	-rm -r $(elementalsdocdir)
+
+
+POD_FILES = pod/hash.pod
+POD_HTML_FILES = pod/hash.html
+
+CLEANFILES = $(POD_HTML_FILES)
+
+$(POD_HTML_FILES) : $(POD_FILES)
+	for p in $(POD_FILES); do h=`echo $$p | sed -e 's/.pod/.html/'`;spod2html --stylesheet=core.css $$p $$h;done
+

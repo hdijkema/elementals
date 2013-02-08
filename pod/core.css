@@ -1,0 +1,252 @@
+.spod {
+	margin-right: auto;
+	margin-left: auto;
+	min-width: 550px;
+	max-width: 1000px;
+	padding-top: 10px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+  	background: white;
+  	color: black;
+  	font-family: arial,sans-serif;
+	font-size: small;
+}
+
+.spod .text {
+  /*float: right;*/
+  clear: none;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  /*width: 67%;*/
+  text-decoration: none;
+}
+
+.spod .referers {
+  font-size: 70%;
+  color: #808080;
+}
+
+.spod .referers TD {
+  font-size: 80%;
+  font-family: courier, Monospace; 
+  margin: 4px;
+  color: #808080;
+}
+
+.spod PRE     {
+  background: #eeeeee;
+  border: 1px solid #888888;
+  color: black;
+  padding: 1em;
+  white-space: pre;
+}
+
+.spod H1      {
+  background: transparent;
+  color: #809000;
+  font-size: x-large;
+  text-indent: 0px;
+}
+
+.spod H2      {
+  background: transparent;
+  color: #008866;
+  font-size: large;
+}
+
+.spod H3	{
+  background: transparent;
+  color: #000000;
+  font-size: medium;
+}
+
+.spod .itemindent {
+	margin-left: -1em;
+   margin-bottom: -0.5em;
+}
+.spod .itemcolor {
+	color: #205555;
+}
+
+.spod .indent1 {
+	margin-left: 1em;
+}
+
+.spod .indent2 {
+	margin-left: 2em;
+}
+
+.spod .indent3 {
+	margin-left: 3em;
+}
+
+.spod .indent4 {
+	margin-left: 4em;
+}
+
+.spod .indent5 {
+	margin-left: 5em;
+}
+
+.spod .indent6 {
+	margin-left: 6em;
+}
+
+.spod .indent7 {
+	margin-left: 7em;
+}
+
+
+.spod IMG     {
+  vertical-align: top;
+}
+
+.spod .header {
+  text-decoration: none;
+}
+
+.spod .toc {
+  //float: left;
+  clear: none;
+  margin-top: 0px;
+  margin-bottom: 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+  /*width: 30%;*/
+}
+
+.spod .toc A  {
+  text-decoration: none;
+  font: small;
+}
+
+.spod .toc H1 {
+  background: transparent;
+  color: #809000;
+  font-size: 145%;
+}
+
+.spod .toc .indent1 {
+	margin-left: 1em;
+}
+
+.spod .toc .indent2 {
+	margin-left: 2em;
+}
+
+.spod .toc .indent3 {
+	margin-left: 3em;
+}
+
+.spod .toc .indent4 {
+	margin-left: 4em;
+}
+
+.spod .toc .indent5 {
+	margin-left: 5em;
+}
+
+.spod .toc .indent6 {
+	margin-left: 6em;
+}
+
+.spod .toc .indent7 {
+	margin-left: 7em;
+}
+
+.spod .toc LI {
+  line-height: 1.2em;
+  list-style-type: none;
+}
+
+.spod .text A {
+  text-decoration: none;
+}
+
+.spod .text PRE     {
+  background: #eeeeee;
+  border: 1px solid #888888;
+  color: black;
+  padding: 1em;
+  white-space: pre;
+  clear: both;
+}
+
+.spod .text CODE {
+    font-family: courier, Monospace; 
+	font-size: 10pt;
+}
+
+.spod .text H1      {
+  background: transparent;
+  color: #809000;
+  font-size: 145%;
+ /* font-size: x-large;*/
+}
+
+.spod .text H2      {
+  background: transparent;
+  color: #809000;
+  font-size: 125%;
+  /*font-size: large;*/
+}
+
+.spod .text H3	{
+  background: transparent;
+  color: #000000;
+  font-size: 110%;
+  /*font-size: medium;*/
+}
+
+.spod .text .itemindent {
+   margin-left: -1em;
+   margin-bottom: -0.5em;
+}
+.spod .text .itemcolor {
+	color: #205555;
+}
+
+.spod .text .indent1 {
+	margin-left: 1em;
+}
+
+.spod .text .indent2 {
+	margin-left: 2em;
+}
+
+.spod .text .indent3 {
+	margin-left: 3em;
+}
+
+.spod .text .indent4 {
+	margin-left: 4em;
+}
+
+.spod .text .indent5 {
+	margin-left: 5em;
+}
+
+.spod .text .indent6 {
+	margin-left: 6em;
+}
+
+.spod .text .indent7 {
+	margin-left: 7em;
+}
+
+
+.spod .text IMG     {
+  vertical-align: top;
+}
+
+.spod .text .header {
+  text-decoration: none;
+}
+
+.faq DT {
+  font-size: 1.4em;
+  font-weight: bold;
+

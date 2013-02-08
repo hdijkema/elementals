@@ -1,0 +1,48 @@
+=pod
+=syn c,2
+=head1 Elementals - Hash
+
+blabla
+
+=head2 Synposys
+
+ #include <elementals/hash.h>
+ 
+ hash_data_t copy_int(int *e) 
+ {
+   int *q = (int *) malloc(sizoef(int));
+   *q=*e;
+   return (hash_data_t) q;
+ }
+
+ void destroy_int(hash_data_t *e) 
+ {
+   free(e);
+ }
+
+ STATIC_DECLARE_HASH(inthash, int);
+ STATIC_IMPLEMENT_HASH(inthash, int, copy_int, destroy_int);
+
+ int main() 
+ {
+   int q = 10;
+   inthash *h = inthash_new(10, HASH_CASE_INSENSITIVE);
+
+   inthash_put(h, "one", &q);
+   q+=10;
+   inthash_put(h, "two", &q);
+
+   printf("%s=%d\n", "two", *inthash_get(h, "two"));
+
+   hash_iter_t it=inthash_iter(h);
+   while (!inthash_iter_end(it)) {
+     printf("%s=%d\n", inthash_iter_key(it), inthash_iter_data(it) );
+     it=inthash_iter_next(it);
+   }
+
+   return 0;
+  
+ }
+
+  
+

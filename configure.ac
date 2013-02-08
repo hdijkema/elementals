@@ -36,4 +36,5 @@ Makefile
 src/elementals-0.1.pc
 src/Makefile
 po/Makefile.in
-test/Makefile])
+test/Makefile
+pod/Makefile])
