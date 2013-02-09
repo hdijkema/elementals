@@ -302,140 +302,49 @@ stat void _list_move_iter(list_t *l,list_pos_t pos) {
   }
 }
 
-/*static inline void swap_data(list_t *l, list_entry_t *a, list_entry_t *b)
+
+static inline list_entry_t *_get_middle(list_entry_t *head)
 {
-  void *d = a->data;
-  a->data = b->data;
-  b->data = d;
+  if (head == NULL) { return head; }
+  list_entry_t *slow, *fast;
+  slow = fast = head;
+  while (fast->next != NULL && fast->next->next != NULL) {
+    slow = slow->next;
+    fast = fast->next->next;
+  }
+  return slow;
 }
 
-#define SWAP(a,b) { void *h=a; a=b; b=h; }
-
-static void sort_part(list_t *l, int (cmp)(list_data_t a,list_data_t b), 
-                              list_entry_t *start, list_entry_t *end, 
-                              int n_elems)
+static list_entry_t *_merge(list_entry_t *a, list_entry_t *b,
+                                     int (*cmp)(list_data_t a,list_data_t b))
 {
-  if (start == end) {
-    // we've reached the bottom
-    return; 
-  } else {
-    if (start->next == end) { // sort tuple
-      int r = cmp(start->data, end->data);
-      if (r > 0) { 
-        swap_data(l, start, end);
-      }
-    } else if (start->next->next == end) { // sort triple a, b, c
-      void *a = start->data;
-      void *b = start->next->data;
-      void *c = end->data;
-
-      int b_gt_c = (cmp(b,c)>0);      
-      if (b_gt_c) { 
-        SWAP(b,c);  // a , b > c -> a c b 
-      } 
-
-      int a_gt_c = (cmp(a,c)>0);  // a, b, c -> a b < c
-      if (a_gt_c) { 
-        SWAP(a,b);SWAP(b,c); // a < b < c 
-      } else {
-        int a_gt_b = (cmp(a,b)>0);
-        if (a_gt_b) { 
-          SWAP(a,b);
-        }
-      }
-
-      start->data = a;
-      start->next->data = b;
-      end->data = c;
-    } else { 
-      // partition and merge sorted partitions
-
-      // partition
-      int N=n_elems/2;
-      list_entry_t *mid = start;
-      int i;
-      for(i=1; i<N; ++i) {
-        mid = mid->next;
-      }
-      sort_part(l, cmp, start, mid, N);
-      sort_part(l, cmp, mid->next, end, n_elems-N);
-
-        list_data_t *merge_table = (list_data_t *) mc_malloc(sizeof(list_data_t) * n_elems);
-        int i=0;
-        list_entry_t *s = start;      // part 1
-        list_entry_t *e = mid->next;  // part 2
-        while (e != end->next && s != mid->next) {
-          if ( cmp(s->data, e->data) <= 0) {
-            merge_table[i++] = s->data;
-            s = s->next;
-          } else {
-            merge_table[i++] = e->data;
-            e = e->next;
-          }
-        }
-        if (e == end->next) {
-          while (s != mid->next) {
-            merge_table[i++] = s->data;
-            s = s->next;
-          }
-        } else if (s == mid->next) {
-          while (e != end->next) {
-            merge_table[i++] = e->data;
-            e = e->next;
-          }
-        }
-        s = start;
-        for (i=0; i < n_elems; ++i) {
-          s->data = merge_table[i];
-          s = s->next;
-        }
-        mc_free(merge_table);
-      
-    }
+  list_entry_t h = { NULL, NULL, NULL };
+  list_entry_t *current = &h;
+  while (a != NULL && b != NULL) {
+    if ( cmp(a->data, b->data) <0 ) { current->next = a; a = a->next; }
+    else { current->next = b; b = b->next; }
+    current = current->next;
   }
-}*/
+  current->next = (a == NULL) ? b : a;
+  return h.next;
+}
 
+static list_entry_t *_merge_sort(list_entry_t *head, int (*cmp)(list_data_t a,list_data_t b))
+{
+  if (head == NULL || head->next == NULL) {
+    return head;
+  }
+  list_entry_t *middle = _get_middle(head);
+  list_entry_t *s_half = middle->next;
+  middle->next = NULL;
+  return _merge(_merge_sort(head,cmp), _merge_sort(s_half, cmp), cmp);
+}
 
 stat void _list_sort(list_t *l,int (*cmp)(list_data_t a,list_data_t b))
 {
-  //sort_part(l, cmp, l->first, l->last, l->count);
-  
-  int listSize=1,numMerges,leftSize,rightSize;
-  list_entry_t *tail, *left, *right, *next;
-  list_entry_t *list = l->first;
-  
-  if (list == NULL  || list->next == NULL) {
-    return;
-  }
-  
-  do { // For each power of two<=list length
-    numMerges=0,left=list;tail=list=0; // Start at the start
-    
-    while (left) { // Do this list_len/listSize times:
-      numMerges++,right=left,leftSize=0,rightSize=listSize;
-      // Cut list into two halves (but don't overrun)
-      while (right && leftSize<listSize) leftSize++,right=right->next;
-      // Run through the lists appending onto what we have so far.
-      while (leftSize>0 || (rightSize>0 && right)) {
-        // Left empty, take right OR Right empty, take left, OR compare.
-        if (!leftSize)                  {next=right;right=right->next;rightSize--;}
-        else if (!rightSize || !right)  {next=left;left=left->next;leftSize--;}
-        else if (compare(left->data,right->data)<0) {next=left;left=left->next;leftSize--;}
-        else                            {next=right;right=right->next;rightSize--;}
-        // Update pointers to keep track of where we are:
-        if (tail) tail->next=next;  else list=next;
-        // Sort prev pointer
-        tail=next;
-      }
-      // Right is now AFTER the list we just sorted, so start the next sort there.
-      left=right;
-    }
-    // Terminate the list, double the list-sort size.
-    tail->next=0,listSize<<=1;
-  } while (numMerges>1); // If we only did one merge, then we just sorted the whole list.
+  l->first = _merge_sort(l->first, cmp);
   
   // administrative update: One sweep to go
-  l->first = list;
   list_entry_t *e = l->first;
   e->previous=NULL;
   while (e->next != NULL) {
