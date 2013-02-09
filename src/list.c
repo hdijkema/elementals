@@ -23,7 +23,7 @@
 #include <elementals/memcheck.h>
 #include <assert.h>
 
-stat list_t *  _list_new()  {
+__list__hod_static list_t *  _list_new()  {
   list_t *l=(list_t *) mc_malloc(sizeof(list_t));
   l->first=NULL;
   l->last=NULL;
@@ -33,7 +33,7 @@ stat list_t *  _list_new()  {
   return l;
 }
 
-stat void _list_destroy(list_t *l,void (*data_destroyer)(list_data_t v)) {
+__list__hod_static void _list_destroy(list_t *l,void (*data_destroyer)(list_data_t v)) {
   log_assert(l!=NULL);
   list_entry_t *e=l->first;
   while (e!=NULL) {
@@ -47,22 +47,22 @@ stat void _list_destroy(list_t *l,void (*data_destroyer)(list_data_t v)) {
   mc_free(l);
 }
 
-stat void _list_lock(list_t *l) {
+__list__hod_static void _list_lock(list_t *l) {
   log_assert(l!=NULL);
   pthread_mutex_lock(l->mutex);
 }
 
-stat void _list_unlock(list_t *l) {
+__list__hod_static void _list_unlock(list_t *l) {
   log_assert(l!=NULL);
   pthread_mutex_unlock(l->mutex);
 }
 
-stat int _list_length(list_t *l) {
+__list__hod_static int _list_length(list_t *l) {
   log_assert(l!=NULL);
   return l->count;
 }
 
-stat list_data_t _list_start_iter(list_t *l,list_pos_t pos) {
+__list__hod_static list_data_t _list_start_iter(list_t *l,list_pos_t pos) {
   log_assert(l!=NULL);
   if (pos==LIST_FIRST) {
     l->current=l->first;
@@ -76,7 +76,7 @@ stat list_data_t _list_start_iter(list_t *l,list_pos_t pos) {
   }
 }
 
-stat list_data_t _list_iter_at(list_t *l,int i) {
+__list__hod_static list_data_t _list_iter_at(list_t *l,int i) {
   log_assert(l!=NULL);
   if (i>=l->count) {
     return NULL;
@@ -89,7 +89,7 @@ stat list_data_t _list_iter_at(list_t *l,int i) {
   }
 }
 
-stat list_data_t _list_next_iter(list_t *l) {
+__list__hod_static list_data_t _list_next_iter(list_t *l) {
   log_assert(l!=NULL);
   if (l->current==NULL) {
     return NULL;
@@ -103,7 +103,7 @@ stat list_data_t _list_next_iter(list_t *l) {
   }
 }
 
-stat list_data_t _list_prev_iter(list_t *l) {
+__list__hod_static list_data_t _list_prev_iter(list_t *l) {
   log_assert(l!=NULL);
   if (l->current==NULL) {
     return NULL;
@@ -117,7 +117,7 @@ stat list_data_t _list_prev_iter(list_t *l) {
   }
 }
 
-stat void _list_drop_iter(list_t *l,void (*data_destroyer)(list_data_t v)) {
+__list__hod_static void _list_drop_iter(list_t *l,void (*data_destroyer)(list_data_t v)) {
   log_assert(l!=NULL);
   if (l->current!=NULL) {
     list_entry_t *e=l->current;
@@ -145,7 +145,7 @@ stat void _list_drop_iter(list_t *l,void (*data_destroyer)(list_data_t v)) {
   }
 }
 
-stat void _list_prepend_iter(list_t *l ,list_data_t data) {
+__list__hod_static void _list_prepend_iter(list_t *l ,list_data_t data) {
   log_assert(l!=NULL);
   if (l->current==NULL) {
     if (l->first==NULL && l->last==NULL) { // first entry in the list
@@ -193,7 +193,7 @@ stat void _list_prepend_iter(list_t *l ,list_data_t data) {
   }
 }
 
-stat void _list_append_iter(list_t *l,list_data_t data) {
+__list__hod_static void _list_append_iter(list_t *l,list_data_t data) {
   log_assert(l!=NULL);
   if (l->current==NULL) {
     if (l->first==NULL && l->last==NULL) {
@@ -249,7 +249,7 @@ stat void _list_append_iter(list_t *l,list_data_t data) {
   }
 }
 
-stat void _list_move_iter(list_t *l,list_pos_t pos) {
+__list__hod_static void _list_move_iter(list_t *l,list_pos_t pos) {
   log_assert(l!=NULL);
   if (l->current==NULL) {
     // does nothing
@@ -340,7 +340,7 @@ static list_entry_t *_merge_sort(list_entry_t *head, int (*cmp)(list_data_t a,li
   return _merge(_merge_sort(head,cmp), _merge_sort(s_half, cmp), cmp);
 }
 
-stat void _list_sort(list_t *l,int (*cmp)(list_data_t a,list_data_t b))
+__list__hod_static void _list_sort(list_t *l,int (*cmp)(list_data_t a,list_data_t b))
 {
   l->first = _merge_sort(l->first, cmp);
   

@@ -22,9 +22,9 @@
 #define __LIST__HOD
 
 #ifndef MEMCHECK_INTERNAL
-  #define stat
+  #define __list__hod_static
 #else
-  #define stat static
+  #define __list__hod_static static
   #ifdef USE_MEMCHECK
     #undef USE_MEMCHECK
   #endif
@@ -50,22 +50,22 @@ typedef struct {
 
 typedef enum { LIST_LAST, LIST_FIRST } list_pos_t;
 
-stat list_t *  _list_new();
-stat void      _list_destroy(list_t *,void (*data_destroyer)(list_data_t v));
-stat int       _list_length(list_t *);
-stat void      _list_lock(list_t *);
-stat void      _list_unlock(list_t *);
-stat void      _list_sort(list_t *, int (*cmp) (list_data_t a, list_data_t b));
+__list__hod_static list_t *  _list_new();
+__list__hod_static void      _list_destroy(list_t *,void (*data_destroyer)(list_data_t v));
+__list__hod_static int       _list_length(list_t *);
+__list__hod_static void      _list_lock(list_t *);
+__list__hod_static void      _list_unlock(list_t *);
+__list__hod_static void      _list_sort(list_t *, int (*cmp) (list_data_t a, list_data_t b));
 
-stat list_data_t _list_start_iter(list_t *,list_pos_t pos);
-stat list_data_t _list_iter_at(list_t *,int i);
-stat list_data_t _list_next_iter(list_t *);
-stat list_data_t _list_prev_iter(list_t *);
+__list__hod_static list_data_t _list_start_iter(list_t *,list_pos_t pos);
+__list__hod_static list_data_t _list_iter_at(list_t *,int i);
+__list__hod_static list_data_t _list_next_iter(list_t *);
+__list__hod_static list_data_t _list_prev_iter(list_t *);
 
-stat void         _list_drop_iter(list_t *,void (*data_destroyer)(list_data_t v));
-stat void         _list_prepend_iter(list_t *,list_data_t data);
-stat void         _list_append_iter(list_t *,list_data_t data);
-stat void         _list_move_iter(list_t *,list_pos_t pos);
+__list__hod_static void         _list_drop_iter(list_t *,void (*data_destroyer)(list_data_t v));
+__list__hod_static void         _list_prepend_iter(list_t *,list_data_t data);
+__list__hod_static void         _list_append_iter(list_t *,list_data_t data);
+__list__hod_static void         _list_move_iter(list_t *,list_pos_t pos);
 
 #define _DECLARE_LIST(MODIFIER, NAME,T) \
   typedef list_t  NAME; \
