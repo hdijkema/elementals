@@ -19,7 +19,7 @@ typedef struct {
 
 memblock_t *memblock_new();
 void        memblock_clear(memblock_t *blk);
-void        memblock_write(memblock_t *blk, void *bytes, size_t size);
+void        memblock_write(memblock_t *blk, const void *bytes, size_t size);
 size_t      memblock_read(memblock_t *blk, void *buf, size_t size);
 off_t       memblock_seek(memblock_t *blk, off_t pos);
 void        memblock_destroy(memblock_t *blk);

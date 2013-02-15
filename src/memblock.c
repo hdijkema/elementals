@@ -26,7 +26,7 @@ void memblock_clear(memblock_t *blk) {
   blk->pos=0;
 }
 
-void memblock_write(memblock_t *blk, void *bytes, size_t s) {
+void memblock_write(memblock_t *blk, const void *bytes, size_t s) {
   if ((blk->size - blk->pos) < s) {
     size_t e = s - (blk->size - blk->pos);
     size_t t = e + blk->size;
