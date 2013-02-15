@@ -19,6 +19,13 @@ memblock_t *memblock_new() {
   return e;
 }
 
+void memblock_clear(memblock_t *blk) {
+  mc_free(blk->block);
+  blk->block=NULL;
+  blk->size=0;
+  blk->pos=0;
+}
+
 void memblock_write(memblock_t *blk, void *bytes, size_t s) {
   if ((blk->size - blk->pos) < s) {
     size_t e = s - (blk->size - blk->pos);
