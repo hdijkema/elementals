@@ -80,7 +80,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libelementals_la_DEPENDENCIES =
 am_libelementals_la_OBJECTS = crc.lo hash.lo list.lo log.lo \
-	memcheck.lo
+	memblock.lo memcheck.lo
 libelementals_la_OBJECTS = $(am_libelementals_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -251,6 +251,7 @@ libelementals_la_SOURCES = \
 	hash.c \
 	list.c \
 	log.c \
+	memblock.c \
 	memcheck.c
 
 libelementals_la_LDFLAGS = 
@@ -266,7 +267,9 @@ otherinclude_HEADERS = elementals/hash.h \
 	elementals/crc.h \
 	elementals/list.h \
 	elementals/log.h \
-	elementals/memcheck.h
+	elementals/memcheck.h \
+	elementals/memblock.h \
+	elementals/os.h
 
 all: all-am
 
@@ -348,6 +351,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memblock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memcheck.Plo@am__quote@
 
 .c.o:

@@ -25,9 +25,9 @@ void memblock_write(memblock_t *blk, void *bytes, size_t s) {
     size_t t = e + blk->size;
     blk->block = (void *) mc_realloc(blk->block, t);
     blk->size = t;
-    log_assert(e->block != NULL);
+    log_assert(blk->block != NULL);
   }
-  memcpy(e->block+e->pos, bytes, s);
+  memcpy(blk->block+blk->pos, bytes, s);
 }
 
 size_t memblock_read(memblock_t *blk, void *buf, size_t s) {
