@@ -38,4 +38,5 @@ otherinclude_HEADERS = elementals/hash.h \
 	elementals/crc.h \
 	elementals/list.h \
 	elementals/log.h \
-	elementals/memcheck.h
+	elementals/memcheck.h \
+	elementals/os.h
