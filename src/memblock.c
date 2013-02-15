@@ -28,12 +28,14 @@ void memblock_write(memblock_t *blk, void *bytes, size_t s) {
     log_assert(blk->block != NULL);
   }
   memcpy(blk->block+blk->pos, bytes, s);
+  blk->pos += s;
 }
 
 size_t memblock_read(memblock_t *blk, void *buf, size_t s) {
   int t = blk->size - blk->pos;
   if (t < s) { s=t; }
   memcpy(buf, blk->block+blk->pos, s);
+  blk->pos += s;
   return s;
 }
 
