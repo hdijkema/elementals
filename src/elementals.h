@@ -7,5 +7,6 @@
 #include <elementals/list.h>
 #include <elementals/hash.h>
 #include <elementals/crc.h>
+#include <elementals/memblock.h>
 
 #endif

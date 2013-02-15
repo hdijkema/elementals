@@ -81,6 +81,7 @@ hash_data_t _hash_iter_data(hash_iter_t it);
 void        _hash_iter_set_data(hash_iter_t it, hash_data_t data, void (*data_destroyer)(hash_data_t));
 
 int         _hash_count(hash_t *hash);
+int         _hash_table_size(hash_t *hash);
 int         _hash_collisions(hash_t *hash);
 
 hash_key_list * _hash_keys(hash_t *hash);
