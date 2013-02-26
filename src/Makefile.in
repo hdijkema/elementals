@@ -255,7 +255,7 @@ libelementals_la_SOURCES = \
 	array.c \
 	memcheck.c
 
-libelementals_la_LDFLAGS = 
+libelementals_la_LDFLAGS = -pthread
 libelementals_la_LIBADD = 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = elementals-0.1.pc
@@ -267,6 +267,7 @@ otherincludedir = $(includedir)/elementals
 otherinclude_HEADERS = elementals/hash.h \
 	elementals/crc.h \
 	elementals/list.h \
+	elementals/fifo.h \
 	elementals/log.h \
 	elementals/memcheck.h \
 	elementals/memblock.h \

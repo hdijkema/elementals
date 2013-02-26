@@ -5,6 +5,7 @@
 #include <elementals/log.h>
 #include <elementals/memcheck.h>
 #include <elementals/list.h>
+#include <elementals/fifo.h>
 #include <elementals/hash.h>
 #include <elementals/crc.h>
 #include <elementals/memblock.h>

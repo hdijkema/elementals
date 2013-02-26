@@ -34,7 +34,7 @@
 #define _IMPLEMENT_FIFO(MODIFIER, NAME, T, COPY, DESTROY) \
   MODIFIER inline NAME* NAME##_new() { return (NAME* ) _list_new(); } \
   MODIFIER inline void NAME##_destroy(NAME* fifo) { _list_destroy(fifo,(void (*)(list_data_t)) DESTROY); } \
-  MODIFIER inline void NAME##_count(NAME* fifo) { return _list_length(fifo); } \
+  MODIFIER inline int NAME##_count(NAME* fifo) { return _list_length(fifo); } \
   MODIFIER inline void NAME##_enqueue(NAME* fifo, T* e) { _list_lock(fifo); \
                                                           _list_start_iter(fifo, LIST_LAST); \
                                                           _list_append_iter(fifo, (list_data_t) COPY(e)); \
@@ -59,7 +59,7 @@
                                                  
 
 #define DECLARE_FIFO(NAME, T) _DECLARE_FIFO(, NAME, T)
-#define IMPLEMENT_FIFO(NAME, T) _IMPLEMENT_FIFO(, NAME, T)
+#define IMPLEMENT_FIFO(NAME, T, COPY, DESTROY) _IMPLEMENT_FIFO(, NAME, T, COPY, DESTROY)
 
 #define STATIC_DECLARE_FIFO(NAME, T) _DECLARE_FIFO(static ,NAME, T)
 #define STATIC_IMPLEMENT_FIFO(NAME, T, COPY, DESTROY) _IMPLEMENT_FIFO(static ,NAME, T, COPY, DESTROY)

@@ -31,6 +31,7 @@
 #endif
 
 #include <pthread.h>
+#include <semaphore.h>
 
 typedef void * list_data_t;
 

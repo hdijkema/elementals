@@ -23,7 +23,7 @@ libelementals_la_SOURCES =  \
 	array.c \
 	memcheck.c
 
-libelementals_la_LDFLAGS = 
+libelementals_la_LDFLAGS = -pthread
 
 libelementals_la_LIBADD = 
 
