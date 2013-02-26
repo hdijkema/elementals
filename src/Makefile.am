@@ -20,6 +20,7 @@ libelementals_la_SOURCES =  \
 	list.c \
 	log.c \
 	memblock.c \
+	array.c \
 	memcheck.c
 
 libelementals_la_LDFLAGS = 
@@ -38,8 +39,10 @@ otherincludedir = $(includedir)/elementals
 otherinclude_HEADERS = elementals/hash.h \
 	elementals/crc.h \
 	elementals/list.h \
+	elementals/fifo.h \
 	elementals/log.h \
 	elementals/memcheck.h \
 	elementals/memblock.h \
+	elementals/array.h \
 	elementals/os.h
 

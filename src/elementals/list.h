@@ -42,6 +42,7 @@ typedef struct __list_entry__ {
 
 typedef struct {
   pthread_mutex_t *mutex;
+  sem_t           *sem;
   list_entry_t    *first;
   list_entry_t    *last;
   list_entry_t    *current;
@@ -69,7 +70,7 @@ __list__hod_static void         _list_move_iter(list_t *,list_pos_t pos);
 
 #define _DECLARE_LIST(MODIFIER, NAME,T) \
   typedef list_t  NAME; \
-  NAME * NAME##_new(); \
+  MODIFIER NAME * NAME##_new(); \
   MODIFIER inline void     NAME##_destroy(NAME *l); \
   MODIFIER inline int      NAME##_length(NAME *l); \
   MODIFIER inline int      NAME##_count(NAME *l); \
@@ -86,7 +87,7 @@ __list__hod_static void         _list_move_iter(list_t *,list_pos_t pos);
   MODIFIER inline void     NAME##_unlock(NAME *l);
 
 #define _IMPLEMENT_LIST(MODIFIER, NAME, T, COPY, DESTROY) \
-  NAME * NAME##_new() { return _list_new(); } \
+  MODIFIER inline NAME * NAME##_new() { return _list_new(); } \
   MODIFIER inline void     NAME##_destroy(NAME *l) { _list_destroy(l,(void (*)(list_data_t)) DESTROY); } \
   MODIFIER inline int      NAME##_length(NAME *l) { return _list_length(l); } \
   MODIFIER inline int      NAME##_count(NAME *l) { return _list_length(l); } \
@@ -97,8 +98,8 @@ __list__hod_static void         _list_move_iter(list_t *,list_pos_t pos);
                                     _list_sort(l, (int (*)(list_data_t,list_data_t)) cmp); \
   } \
   MODIFIER inline void     NAME##_drop_iter(NAME *l) { _list_drop_iter(l,(void (*)(list_data_t)) DESTROY); } \
-  MODIFIER inline void     NAME##_prepend_iter(NAME *l,T *e) { _list_prepend_iter(l,(list_data_t *) COPY(e)); } \
-  MODIFIER inline void     NAME##_append_iter(NAME *l, T *e) { _list_append_iter(l,(list_data_t *) COPY(e)); } \
+  MODIFIER inline void     NAME##_prepend_iter(NAME *l,T *e) { _list_prepend_iter(l,(list_data_t) COPY(e)); } \
+  MODIFIER inline void     NAME##_append_iter(NAME *l, T *e) { _list_append_iter(l,(list_data_t) COPY(e)); } \
   MODIFIER inline T *      NAME##_iter_at(NAME *l, int i) { return (T *) _list_iter_at(l,i); } \
   MODIFIER inline void     NAME##_move_iter(NAME *l,list_pos_t pos) { _list_move_iter(l,pos); } \
   MODIFIER inline void     NAME##_lock(NAME *l) { _list_lock(l); } \

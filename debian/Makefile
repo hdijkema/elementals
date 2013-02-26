@@ -1,12 +1,11 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=3
+SUBVERSION=4
 PACKAGE=elementals
 DEPENDS=
 DEPENDS1=
 BUILDDEPENDS=automake,autoconf,intltool
-#DISTROS=natty oneiric precise quantal
-DISTROS=precise
+DISTROS=natty oneiric precise quantal maverick lucid
 #DISTROS=precise
 DISTROS1=maverick lucid
 DVERSION=${VERSION}.${DISTRO}.${SUBVERSION}
@@ -46,7 +45,7 @@ test:
 	(cd ${UBUNTU};sudo pbuilder build *.dsc)
 
 ppa: clean
-	for distro in ${DISTROS}; do make ppa1 DISTRO=$$distro DEPEND=${DEPENDS}; done
+	for distro in ${DISTROS}; do make clean;make ppa1 DISTRO=$$distro DEPEND=${DEPENDS}; done
 
 ppa_old: clean
 	for distro in ${DISTROS1}; do make ppa1 DISTRO=$$distro DEPEND=${DEPENDS1}; done

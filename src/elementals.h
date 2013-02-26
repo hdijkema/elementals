@@ -8,5 +8,6 @@
 #include <elementals/hash.h>
 #include <elementals/crc.h>
 #include <elementals/memblock.h>
+#include <elementals/array.h>
 
 #endif
