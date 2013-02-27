@@ -168,6 +168,20 @@ int main() {
              presult(r);
   });
 
+  TEST(t51,{ hre_t re = hre_compile("[0-9.]+","i");
+             printf("has match = %d\n", hre_has_match(re, str ));
+  });
+  
+  TEST(t52,{ hre_t re = hre_compile("e","i");
+             char* r = hre_replace_all(re, str, "oo");
+             hre_trim(r);
+             hre_t re1 = hre_compile("[0-9]+","");
+             char* r1 = hre_replace_all(re1, str, "T"); 
+             hre_trim(r1);
+             presult(r);
+             printf("\n");
+             presult(r1);
+  });
   
   return 0;
 }

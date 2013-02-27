@@ -98,17 +98,13 @@ hre_matches hre_match_all(hre_t re, const char* string)
     int i, l;
     for(i = 0, l = hre_matches_count(m);i < l;++i) {
       hre_match_t *match = hre_matches_get(m, i);
-      printf("%s - %s(%d)\n",string, hre_match_str(match),hre_match_end(match));
       hre_matches_append(R, match);
     }
     
     hre_match_t *match = hre_matches_get(m, 0);
     int k = hre_match_end(match);
-    printf("%s - %s(%d)\n",string, hre_match_str(match),hre_match_end(match));
     hre_matches_destroy(m);
-    printf("k=%d\n",k);
     const char* p = &string[k];
-    printf("p=%s\n", p);
     m = hre_match(re, p);
     for(i = 0, l = hre_matches_count(m);i < l;++i) {
       hre_match_t *match = hre_matches_get(m, i);
@@ -120,6 +116,43 @@ hre_matches hre_match_all(hre_t re, const char* string)
   hre_matches_destroy(m);
   
   return R;
+}
+
+hre_matches hre_match_all0(hre_t re, const char* string)
+{
+  hre_matches R = hre_matches_new();
+  hre_matches m = hre_match(re, string);
+  
+  while (hre_matches_count(m) > 0) {
+    hre_match_t *match = hre_matches_get(m, 0);
+    hre_matches_append(R, match);
+    int k = hre_match_end(match);
+    hre_matches_destroy(m);
+    const char* p = &string[k];
+    m = hre_match(re, p);
+    int i, l;
+    for(i = 0, l = hre_matches_count(m);i < l;++i) {
+      hre_match_t *match = hre_matches_get(m, i);
+      match->begin_offset += k;
+      match->end_offset += k;
+    }
+  }
+  
+  hre_matches_destroy(m);
+  
+  return R;
+}
+
+el_bool hre_has_match(hre_t re, const char* string)
+{
+  hre_matches m = hre_match(re, string);
+  if (hre_matches_count(m) == 0) {
+    hre_matches_destroy(m);
+    return el_false;
+  } else {
+    hre_matches_destroy(m);
+    return el_true;
+  }
 }
 
 char* hre_replace(hre_t re, const char* string, const char* replacement)
@@ -137,6 +170,42 @@ char* hre_replace(hre_t re, const char* string, const char* replacement)
   } else {
     return mc_strdup(string);
   }
+}
+
+char* hre_replace_all(hre_t re,const char* string, const char* replacement)
+{
+  hre_matches m = hre_match_all0(re, string);
+  int i, l = hre_matches_count(m);
+  char **s = (char**) mc_malloc(sizeof(char*) * ((l+1)*2));
+  int n, b = 0;
+  for(n = 0, i = 0 ; i < l; ++i) {
+    printf("%d\n",i);
+    hre_match_t *match = hre_matches_get(m, i);
+    int el = match->begin_offset - b;
+    printf("%d - %d\n",b,el);
+    s[n] = hre_substr(string, b, el);
+    printf("'%s'\n",s[n]);
+    //el = match->end_offset - match->begin_offset;
+    s[n+1] = mc_strdup(replacement);//hre_substr(string, match->begin_offset, el);
+    printf("'%s'\n",s[n+1]);
+    n += 2;
+    b = match->end_offset;
+  }
+  s[n] = hre_substr(string, b, -1);
+  n += 1;
+  hre_matches_destroy(m);
+  
+  char* q = mc_strdup("");
+  for(i=0; i < n; i++) {
+    printf("%d = %s\n",i,s[i]);
+    char* r = hre_concat(q, s[i]);
+    mc_free(q);
+    mc_free(s[i]);
+    q = r;
+  }
+  mc_free(s);
+  
+  return q;
 }
 
 void hre_destroy(hre_t re)

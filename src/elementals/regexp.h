@@ -2,6 +2,7 @@
 #define __REGEXP__HOD
 
 #include <elementals/array.h>
+#include <elementals/types.h>
 
 typedef struct {
   int begin_offset;
@@ -21,9 +22,14 @@ typedef void* hre_t;
 DECLARE_EL_ARRAY(hre_matches, hre_match_t);
 
 hre_t hre_compile(const char *re, const char* modifiers);
+
 hre_matches hre_match(hre_t re, const char* string);
 hre_matches hre_match_all(hre_t re, const char* string);
+el_bool hre_has_match(hre_t re, const char* string);
+
 char* hre_replace(hre_t re, const char* string, const char* replacement);
+char* hre_replace_all(hre_t re, const char* string, const char* replacement);
+
 void hre_destroy(hre_t re);
 
 void hre_trim(char* string);
