@@ -1,6 +1,6 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=4
+SUBVERSION=5
 PACKAGE=elementals
 DEPENDS=
 DEPENDS1=
