@@ -5,7 +5,9 @@ check_bindir =
 check_bin_PROGRAMS =  \
 	test_hash \
 	test_list \
-	test_fifo
+	test_fifo \
+	test_array \
+	test_hre
 
 test_hash_SOURCES =  \
 	test_hash.c
@@ -50,3 +52,32 @@ test_fifo_CPPFLAGS = -I../src \
 	-DUSE_MEMCHECK 
 
 test_fifo_LDFLAGS = ../src/memcheck.o ../src/list.o -pthread
+
+
+test_array_CFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_array_SOURCES =  \
+	test_array.c
+
+test_array_CPPFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_array_LDFLAGS = ../src/memcheck.o -pthread
+
+
+test_hre_CFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_hre_SOURCES =  \
+	test_hre.c
+
+test_hre_CPPFLAGS = -I../src \
+	-DUSE_MEMCHECK 
+
+test_hre_LDFLAGS = ../src/memcheck.o ../src/array.o -pthread
+
+test_hre_LDADD = $(LIBPCRE_LIBS) 
+
+
+AM_CPPFLAGS = $(LIBPCRE_CFLAGS) 

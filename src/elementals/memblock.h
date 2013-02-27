@@ -10,6 +10,9 @@
 #define _memblock_h
 
 #include <stdio.h>
+#ifndef __off_t_defined
+typedef long off_t;
+#endif
 
 typedef struct {
   void *block;

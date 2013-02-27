@@ -148,8 +148,18 @@ void *_mc_calloc( size_t num, size_t size, const char *func, const char *file, i
 
 char *_mc_strdup( const char * s, const char *func, const char *file, int line ) {
   mc_check_init();
-  char *ss=_mc_malloc(strlen(s)+1, func, file, line);
+  char *ss=_mc_malloc((strlen(s)+1)*sizeof(char), func, file, line);
   strcpy(ss,s);
+  return ss;
+}
+
+char *_mc_strndup(const char* s, int n, const char* func, const char* file, int line) {
+  mc_check_init();
+  int l = strlen(s);
+  if (l < n) { n = l; }
+  char *ss=_mc_malloc((n + 1)*sizeof(char), func, file, line);
+  strncpy(ss, s, n);
+  ss[n] = '\0';
   return ss;
 }
 

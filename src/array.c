@@ -5,7 +5,7 @@
 
 el_array_t *_el_array_new(void)
 {
-  el_array_t *a = (el_array_t *) malloc(sizeof(el_array_t));
+  el_array_t *a = (el_array_t *) mc_malloc(sizeof(el_array_t));
   if (a == NULL) {
     return a;
   }
@@ -61,7 +61,7 @@ el_array_code _el_array_delete(el_array_t *a, int index, void (*destroyer)(void 
       destroyer(a->array[index]);
     }
     int i;
-    for(i=index+1;i < a->count-1; ++i) {
+    for(i=index;i < a->count-1; ++i) {
       a->array[i] = a->array[i+1];
     }
     a->array[a->count-1] = NULL;
@@ -104,6 +104,16 @@ int _el_array_count(el_array_t *a)
 {
   log_assert(a != NULL);
   return a->count;
+}
+
+void _el_array_destroy(el_array_t* a, void (*destroyer)(void *))
+{
+  log_assert(a != NULL);
+  while(a->count > 0) {
+    _el_array_delete(a, 0, destroyer);
+  }
+  mc_free(a->array);
+  mc_free(a);
 }
 
 

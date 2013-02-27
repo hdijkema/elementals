@@ -5,7 +5,8 @@
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
-	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
+	$(LIBPCRE_CFLAGS)
 
 AM_CFLAGS =\
 	 -Wall\
@@ -21,17 +22,20 @@ libelementals_la_SOURCES =  \
 	log.c \
 	memblock.c \
 	array.c \
-	memcheck.c
+	memcheck.c \
+	fileinfo.c \
+	regexp.c
 
 libelementals_la_LDFLAGS = -pthread
 
-libelementals_la_LIBADD = 
+libelementals_la_LIBADD =  \
+	$(LIBPCRE_LIBS)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = elementals-0.1.pc
+pkgconfig_DATA = elementals.pc
 
 EXTRA_DIST = \
-	elementals-0.1.pc.in
+	elementals.pc.in
 
 include_HEADERS = elementals.h 
 	
@@ -44,5 +48,8 @@ otherinclude_HEADERS = elementals/hash.h \
 	elementals/memcheck.h \
 	elementals/memblock.h \
 	elementals/array.h \
-	elementals/os.h
+	elementals/os.h \
+	elementals/fileinfo.h \
+	elementals/types.h \
+	elementals/regexp.h
 

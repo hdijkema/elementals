@@ -31,7 +31,7 @@ __list__hod_static list_t *  _list_new()  {
   l->mutex=(pthread_mutex_t *) mc_malloc(sizeof(pthread_mutex_t));
   l->sem=(sem_t *) mc_malloc(sizeof(sem_t));
   pthread_mutex_init(l->mutex,NULL);
-  sem_init(l->sem, 0, 1);
+  sem_init(l->sem, 0, 0);
   return l;
 }
 

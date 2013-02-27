@@ -3,10 +3,10 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 datarootdir=@datarootdir@
 datadir=@datadir@
-includedir=@includedir@/libelementals-0.1
+includedir=@includedir@
 
 Name: libelementals
-Description: Sample library created by Anjuta project wizard.
+Description: Elementals, small one task creatures
 Version: @VERSION@
 Requires: 
 Libs: -L${libdir} -lelementals

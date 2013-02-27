@@ -39,14 +39,14 @@ host_triplet = @host@
 subdir = src
 DIST_COMMON = $(include_HEADERS) $(otherinclude_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/elementals-0.1.pc.in
+	$(srcdir)/elementals.pc.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = elementals-0.1.pc
+CONFIG_CLEAN_FILES = elementals.pc
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -78,9 +78,10 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
 	"$(DESTDIR)$(includedir)" "$(DESTDIR)$(otherincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libelementals_la_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+libelementals_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_libelementals_la_OBJECTS = crc.lo hash.lo list.lo log.lo \
-	memblock.lo array.lo memcheck.lo
+	memblock.lo array.lo memcheck.lo fileinfo.lo regexp.lo
 libelementals_la_OBJECTS = $(am_libelementals_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -156,6 +157,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
+LIBPCRE_CFLAGS = @LIBPCRE_CFLAGS@
+LIBPCRE_LIBS = @LIBPCRE_LIBS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
@@ -178,6 +181,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -239,7 +245,8 @@ top_srcdir = @top_srcdir@
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
-	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
+	$(LIBPCRE_CFLAGS)
 
 AM_CFLAGS = \
 	 -Wall\
@@ -253,14 +260,18 @@ libelementals_la_SOURCES = \
 	log.c \
 	memblock.c \
 	array.c \
-	memcheck.c
+	memcheck.c \
+	fileinfo.c \
+	regexp.c
 
 libelementals_la_LDFLAGS = -pthread
-libelementals_la_LIBADD = 
+libelementals_la_LIBADD = \
+	$(LIBPCRE_LIBS)
+
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = elementals-0.1.pc
+pkgconfig_DATA = elementals.pc
 EXTRA_DIST = \
-	elementals-0.1.pc.in
+	elementals.pc.in
 
 include_HEADERS = elementals.h 
 otherincludedir = $(includedir)/elementals
@@ -272,7 +283,10 @@ otherinclude_HEADERS = elementals/hash.h \
 	elementals/memcheck.h \
 	elementals/memblock.h \
 	elementals/array.h \
-	elementals/os.h
+	elementals/os.h \
+	elementals/fileinfo.h \
+	elementals/types.h \
+	elementals/regexp.h
 
 all: all-am
 
@@ -308,7 +322,7 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-elementals-0.1.pc: $(top_builddir)/config.status $(srcdir)/elementals-0.1.pc.in
+elementals.pc: $(top_builddir)/config.status $(srcdir)/elementals.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -352,11 +366,13 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fileinfo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memblock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memcheck.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regexp.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
