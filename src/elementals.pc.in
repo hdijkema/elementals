@@ -8,6 +8,6 @@ includedir=@includedir@
 Name: libelementals
 Description: Elementals, small one task creatures
 Version: @VERSION@
-Requires: 
+Requires: libpcre
 Libs: -L${libdir} -lelementals
 Cflags: -I${includedir}
