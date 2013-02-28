@@ -1,10 +1,26 @@
 #include <elementals/memcheck.h>
 #include <elementals/fileinfo.h>
+#include <elementals/regexp.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #define SEP '/'
+#define STRSEP "/"
+
 static inline int is_sep(char c) {
   return c == SEP;
+}
+
+file_info_t *file_info_new_home(const char* file)
+{
+  const char* home=getenv("HOME");
+  if (home == NULL) { home = "."; }
+  char* full = hre_concat3(home, STRSEP, file);
+  file_info_t* info = file_info_new(full);
+  mc_free(full);
+  return info;
 }
 
 file_info_t *file_info_new(const char *path) 
@@ -38,6 +54,20 @@ file_info_t *file_info_new(const char *path)
   }
   
   info->absolute_path = mc_take_over(realpath(info->path, NULL));
+  if (info->absolute_path == NULL) {
+    if (strlen(info->dirname) > 0) {
+      file_info_t *i = file_info_new(info->dirname);
+      if (i->absolute_path != NULL) {
+        info->absolute_path = hre_concat3(i->absolute_path, STRSEP, info->filename);
+      }
+      file_info_destroy(i);
+    } else {
+      char buf[10240];
+      if (getcwd(buf,10240) == buf) {
+        info->absolute_path = mc_strdup(buf);
+      }
+    }
+  }
   
   return info;
 }
@@ -81,6 +111,41 @@ void file_info_destroy(file_info_t* info)
   mc_free(info->dirname);
   mc_free(info->filename);
   mc_free(info);
+}
+
+el_bool file_info_exists(file_info_t* info)
+{
+  return access(info->absolute_path, F_OK) == 0;
+}
+
+el_bool file_info_is_dir(file_info_t* info)
+{
+  struct stat st;
+  stat(info->absolute_path, &st);
+  switch (st.st_mode & S_IFMT) {
+    case S_IFDIR: return el_true;
+    default: return el_false;
+  }
+}
+
+el_bool file_info_is_file(file_info_t* info)
+{
+  struct stat st;
+  stat(info->absolute_path, &st);
+  switch (st.st_mode & S_IFMT) {
+    case S_IFREG: return el_true;
+    default: return el_false;
+  }
+}
+
+el_bool file_info_can_read(file_info_t* info)
+{
+  return access(info->absolute_path, R_OK) == 0;
+}
+
+el_bool file_info_can_write(file_info_t* info)
+{
+  return access(info->absolute_path, W_OK) == 0;
 }
 
 
