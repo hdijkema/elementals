@@ -2,6 +2,7 @@
 #define __FILEINFO_HOD
 
 #include <elementals/types.h>
+#include <time.h>
 
 typedef struct {
   char* path;
@@ -28,6 +29,8 @@ el_bool file_info_is_dir(file_info_t *info);
 el_bool file_info_is_file(file_info_t *info);
 el_bool file_info_can_read(file_info_t *info);
 el_bool file_info_can_write(file_info_t *info);
+
+time_t file_info_mtime(file_info_t *info);
 
 #endif
 

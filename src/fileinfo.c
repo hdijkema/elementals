@@ -148,5 +148,14 @@ el_bool file_info_can_write(file_info_t* info)
   return access(info->absolute_path, W_OK) == 0;
 }
 
+time_t file_info_mtime(file_info_t* info)
+{
+  struct stat st;
+  if (!stat(info->absolute_path, &st)) {
+    return st.st_mtime;
+  } else {
+    return 0;
+  }
+}
 
 
