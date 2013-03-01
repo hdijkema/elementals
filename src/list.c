@@ -20,7 +20,9 @@
 
 #include <elementals/log.h>
 #include <elementals/list.h>
+#ifndef MEMCHECK_INTERNAL
 #include <elementals/memcheck.h>
+#endif
 #include <assert.h>
 
 __list__hod_static list_t *  _list_new()  {
@@ -46,6 +48,7 @@ __list__hod_static void _list_destroy(list_t *l,void (*data_destroyer)(list_data
   }
   pthread_mutex_destroy(l->mutex);
   sem_destroy(l->sem);
+  mc_free(l->sem);
   mc_free(l->mutex);
   mc_free(l);
 }

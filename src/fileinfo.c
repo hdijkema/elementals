@@ -53,7 +53,7 @@ file_info_t *file_info_new(const char *path)
     info->path[k] = h;
   }
   
-  info->absolute_path = mc_take_over(realpath(info->path, NULL));
+  info->absolute_path = realpath(info->path, NULL);
   if (info->absolute_path == NULL) {
     if (strlen(info->dirname) > 0) {
       file_info_t *i = file_info_new(info->dirname);
@@ -67,6 +67,8 @@ file_info_t *file_info_new(const char *path)
         info->absolute_path = mc_strdup(buf);
       }
     }
+  } else {
+    mc_take_control(info->absolute_path, strlen(info->absolute_path)+1);
   }
   
   return info;

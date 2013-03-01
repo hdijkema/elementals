@@ -87,6 +87,8 @@ int main() {
 
   pthread_join(producer_, NULL);
   pthread_join(consumer_, NULL);
+  
+  ififo_destroy(fifo);
 
   return 0;
 }
