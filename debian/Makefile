@@ -1,6 +1,6 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=9
+SUBVERSION=2
 PACKAGE=elementals
 DEPENDS=libpcre3
 DEPENDS1=

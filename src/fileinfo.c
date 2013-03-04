@@ -160,4 +160,14 @@ time_t file_info_mtime(file_info_t* info)
   }
 }
 
+size_t file_info_size(file_info_t* info)
+{
+  struct stat st;
+  if (!stat(info->absolute_path, &st)) {
+    return st.st_size;
+  } else {
+    return 0;
+  }
+}
+
 

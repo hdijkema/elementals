@@ -29,7 +29,8 @@
   MODIFIER inline int  NAME##_count(NAME* fifo); \
   MODIFIER inline void NAME##_enqueue(NAME* fifo, T* e); \
   MODIFIER inline T*   NAME##_dequeue(NAME* fifo); \
-  MODIFIER inline T*   NAME##_peek(NAME* fifo);
+  MODIFIER inline T*   NAME##_peek(NAME* fifo); \
+  MODIFIER inline void NAME##_clear(NAME* fifo);
   
 #define _IMPLEMENT_FIFO(MODIFIER, NAME, T, COPY, DESTROY) \
   MODIFIER inline NAME* NAME##_new() { return (NAME* ) _list_new(); } \
@@ -55,6 +56,15 @@
                                                 e = (T *) _list_start_iter(fifo, LIST_FIRST); \
                                               _list_unlock(fifo); \
                                               return e; \
+ } \
+ MODIFIER inline void NAME##_clear(NAME* fifo) { \
+   _list_lock(fifo); \
+   while (_list_length(fifo) > 0) { \
+     _list_start_iter(fifo, LIST_FIRST); \
+     _list_drop_iter(fifo, (void (*)(list_data_t)) DESTROY); \
+   } \
+   sem_init(fifo->sem, 0, 0); \
+   _list_unlock(fifo); \
  }
                                                  
 
