@@ -21,7 +21,9 @@
 #include <elementals/log.h>
 #include <elementals/crc.h>
 #include <elementals/hash.h>
+#ifndef MEMCHECK_INTERNAL
 #include <elementals/memcheck.h>
+#endif
 #include <string.h>
 
 static const char *copy_key(const char *e)
@@ -37,7 +39,11 @@ static int key_cmp(const char *a,const char *b) {
   return strcmp(a,b);
 }
 
+#ifdef MEMCHECK_INTERNAL
+STATIC_IMPLEMENT_LIST(hash_key_list,const char,copy_key, destroy_key);
+#else
 IMPLEMENT_LIST(hash_key_list,const char,copy_key, destroy_key);
+#endif
 
 /******************************************************************/
 
@@ -112,24 +118,24 @@ static int eq_case_insensitive(const char *k1,const char *k2) {
 
 /******************************************************************/
 
-int _hash_count(hash_t *h) {
+__hash__hod_static int _hash_count(hash_t *h) {
   log_assert(h != NULL);
   return h->count;
 }
 
-int _hash_collisions (hash_t *h) {
+__hash__hod_static int _hash_collisions (hash_t *h) {
   log_assert(h != NULL);
   return h->collisions;
 }
 
-int _hash_table_size(hash_t *hash) {
+__hash__hod_static int _hash_table_size(hash_t *hash) {
   log_assert(hash != NULL);
   return hash->table_size;
 }
 
 /******************************************************************/
 
-hash_t *_hash_new(int initial_table_size,int case_sensitive) {
+__hash__hod_static hash_t *_hash_new(int initial_table_size,int case_sensitive) {
   hash_t *h=(hash_t *) mc_malloc(sizeof(hash_t));
   if (h!=NULL) {
     int N=next_prime((initial_table_size<10) ? 10 : initial_table_size);
@@ -147,7 +153,7 @@ hash_t *_hash_new(int initial_table_size,int case_sensitive) {
   }
 }
 
-void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
+__hash__hod_static void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
   log_assert(h!=NULL);
   int i,N;
   for(i=0,N=h->table_size;i<N;i++) {
@@ -173,7 +179,7 @@ void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
   mc_free(h);
 }
 
-void _hash_put(hash_t *h, const char *key, hash_data_t data,
+__hash__hod_static void _hash_put(hash_t *h, const char *key, hash_data_t data,
                             void (*data_destroyer)(hash_data_t))
 {
     log_assert(h!=NULL);
@@ -182,7 +188,7 @@ void _hash_put(hash_t *h, const char *key, hash_data_t data,
     pthread_mutex_unlock(h->mutex);
 }
 
-void hash_put1(hash_t *h,const char *key,hash_data_t data,
+__hash__hod_static void hash_put1(hash_t *h,const char *key,hash_data_t data,
                              void (*data_destroyer)(hash_data_t))
 {
 
@@ -236,7 +242,7 @@ void hash_put1(hash_t *h,const char *key,hash_data_t data,
   INC(h->update_count);
 }
 
-hash_data_t _hash_get(hash_t *h, const char *key)
+__hash__hod_static hash_data_t _hash_get(hash_t *h, const char *key)
 {
   log_assert(h!=NULL);
   pthread_mutex_lock(h->mutex);
@@ -269,7 +275,7 @@ hash_data_t _hash_get(hash_t *h, const char *key)
   return result;
 }
 
-void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
+__hash__hod_static void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
 {
   log_assert(h!=NULL);
   pthread_mutex_lock(h->mutex);
@@ -321,12 +327,12 @@ void _hash_del(hash_t *h, const char *key, void (*data_destroyer)(hash_data_t))
   pthread_mutex_unlock(h->mutex);
 }
 
-int _hash_exists(hash_t *hash,const char *key) {
+__hash__hod_static int _hash_exists(hash_t *hash,const char *key) {
   log_assert(hash != NULL);
   return _hash_get(hash,key)!=NULL;
 }
 
-hash_iter_t _hash_iter(hash_t *hash) {
+__hash__hod_static hash_iter_t _hash_iter(hash_t *hash) {
   log_assert(hash != NULL);
   pthread_mutex_lock(hash->mutex);
 
@@ -350,22 +356,22 @@ hash_iter_t _hash_iter(hash_t *hash) {
   return iter;
 }
 
-int _hash_iter_end(hash_iter_t it) {
+__hash__hod_static int _hash_iter_end(hash_iter_t it) {
   if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   return it.key==NULL;
 }
 
-const char *_hash_iter_key(hash_iter_t it) {
+__hash__hod_static const char *_hash_iter_key(hash_iter_t it) {
   if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   return it.key;
 }
 
-hash_data_t _hash_iter_data(hash_iter_t it) {
+__hash__hod_static hash_data_t _hash_iter_data(hash_iter_t it) {
   if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   return it.data;
 }
 
-void _hash_iter_set_data(hash_iter_t it, hash_data_t d, void (*destroyer) (hash_data_t)) {
+__hash__hod_static void _hash_iter_set_data(hash_iter_t it, hash_data_t d, void (*destroyer) (hash_data_t)) {
   if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   hash_t *h = it.hash;
   pthread_mutex_lock(h->mutex);
@@ -379,7 +385,7 @@ void _hash_iter_set_data(hash_iter_t it, hash_data_t d, void (*destroyer) (hash_
   pthread_mutex_unlock(h->mutex);
 }
 
-hash_iter_t _hash_iter_next(hash_iter_t it) {
+__hash__hod_static hash_iter_t _hash_iter_next(hash_iter_t it) {
   if (it.hash->update_count != it.update_count) { log_fatal("hash has been invalidated"); }
   hash_t *h=it.hash;
   pthread_mutex_lock(h->mutex);
@@ -414,7 +420,7 @@ hash_iter_t _hash_iter_next(hash_iter_t it) {
   return iter;
 }
 
-hash_key_list *_hash_keys(hash_t *h) {
+__hash__hod_static hash_key_list *_hash_keys(hash_t *h) {
   pthread_mutex_lock(h->mutex);
   hash_key_list *l=hash_key_list_new();
   int i,N;
@@ -434,7 +440,7 @@ hash_key_list *_hash_keys(hash_t *h) {
   return l;
 }
 
-hash_key_cmp _hash_key_cmp(hash_t *h) {
+__hash__hod_static hash_key_cmp _hash_key_cmp(hash_t *h) {
   return key_cmp;
 }
 

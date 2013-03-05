@@ -138,8 +138,7 @@ __list__hod_static void _list_drop_iter(list_t *l,void (*data_destroyer)(list_da
     } else if (e==l->first) {
       l->first=e->next;
       l->first->previous=NULL;
-      e->previous=NULL;
-      l->current=e->next;
+      l->current = l->first;
     } else {
       e->previous->next=e->next;
       e->next->previous=e->previous;

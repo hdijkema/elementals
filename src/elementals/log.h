@@ -60,6 +60,7 @@ inline int log_this_severity();
 #define log_msg3(severity,template,m1,m2) log_imsg(severity,fprintf(log_handle(),template,m1,m2))
 #define log_msg4(severity,template,m1,m2,m3) log_imsg(severity,fprintf(log_handle(),template,m1,m2,m3))
 #define log_msg5(severity,template,m1,m2,m3,m4) log_imsg(severity,fprintf(log_handle(),template,m1,m2,m3,m4))
+#define log_msg6(severity,template,m1,m2,m3,m4,m5) log_imsg(severity,fprintf(log_handle(),template,m1,m2,m3,m4,m5))
 
 #define log_fcall(msg)  log_msg(LOG_FCALL,msg)
 
@@ -99,6 +100,11 @@ inline int log_this_severity();
 #define log_fatal5(template,msg,m2,m3,m4) (log_msg5(LOG_FATAL,template,msg,m2,m3,m4),abort())
 #define log_info5(template,msg,m2,m3,m4) log_msg5(LOG_INFO,template,msg,m2,m3,m4)
 #define log_error5(template,msg,m2,m3,m4) log_msg5(LOG_ERROR,template,msg,m2,m3,m4)
+
+#define log_debug6(template,msg,m2,m3,m4,m5) log_msg6(LOG_DEBUG,template,msg,m2,m3,m4,m5)
+#define log_fatal6(template,msg,m2,m3,m4,m5) (log_msg6(LOG_FATAL,template,msg,m2,m3,m4,m5),abort())
+#define log_info6(template,msg,m2,m3,m4,m5) log_msg6(LOG_INFO,template,msg,m2,m3,m4,m5)
+#define log_error6(template,msg,m2,m3,m4,m5) log_msg6(LOG_ERROR,template,msg,m2,m3,m4,m5)
 
 
 #define cond_log_error2(cond,template,msg) if (cond) { log_error2(template,msg); }

@@ -20,7 +20,7 @@
 #define USE_MEMCHECK
 
 #define MEMCHECK_INTERNAL
-#include <elementals/list.h>
+#include <elementals/hash.h>
 #include <elementals/log.h>
 #include <elementals/types.h>
 #include <elementals/memcheck.h>
@@ -36,12 +36,12 @@
 #undef mc_strdup
 
 #define mc_malloc(s) malloc(s)
-#define mc_realloc(s) realloc(s)
-#define mc_calloc(s) calloc(s)
+#define mc_realloc(p, s) realloc(p, s)
+#define mc_calloc(s, n) calloc(s, n)
 #define mc_strdup(s) strdup(s)
 #define mc_free(s) free(s)
+#include "hash.c"
 #include "list.c"
-
 
 typedef struct {
   size_t  size;
@@ -51,25 +51,25 @@ typedef struct {
   void   *ptr;
 } mc_entry_t;
 
-static list_data_t copy(mc_entry_t *e) {
+static mc_entry_t* copy(mc_entry_t *e) {
   return e;
 }
 
-static void destroy(list_data_t e) {
-  mc_entry_t *m=(mc_entry_t *) e;
+static void destroy(mc_entry_t* m) {
   free(m->ptr);
   free(m);
 }
 
-STATIC_DECLARE_LIST(mc_list,mc_entry_t);
-STATIC_IMPLEMENT_LIST(mc_list,mc_entry_t,copy,destroy);
+STATIC_DECLARE_HASH(mc_hash, mc_entry_t);
+STATIC_IMPLEMENT_HASH(mc_hash, mc_entry_t, copy, destroy);
 
-static mc_list *MEMLIST = NULL;
+static mc_hash *MEMHASH = NULL;
+
 static el_bool  enabled = el_false;
 
 static void inline mc_check_init() {
-  if (MEMLIST == NULL) {
-    MEMLIST = mc_list_new();
+  if (MEMHASH == NULL) {
+    MEMHASH = mc_hash_new(10, HASH_CASE_SENSITIVE);
     atexit(mc_report);
   }
 }
@@ -84,10 +84,9 @@ void *_mc_malloc( size_t size, const char *func, const char *file, int line ) {
     e->file=file;
     e->line=line;
     e->ptr=p;
-    mc_list_lock(MEMLIST);
-    mc_list_start_iter(MEMLIST,LIST_FIRST);
-    mc_list_prepend_iter(MEMLIST,e);
-    mc_list_unlock(MEMLIST);
+    char s[50];
+    sprintf(s,"%p", p);
+    mc_hash_put(MEMHASH, s, e);
     return p;
   } else {
     return malloc(size);
@@ -98,11 +97,10 @@ void *_mc_take_over( void *ptr, const char *func, const char *file, int line ) {
   if (enabled) {
     mc_check_init();
   
-    mc_list_lock(MEMLIST);
-    mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
-    while (e != NULL && e->ptr != ptr) {
-      e = mc_list_next_iter(MEMLIST);
-    }
+    char s[50];
+    sprintf(s,"%p",ptr);
+    mc_entry_t *e = mc_hash_get(MEMHASH, s);
+
     if (e == NULL) {
       log_error4("Cannot take over memory at %s, %s, %d",func,file,line);
     } else {
@@ -110,7 +108,7 @@ void *_mc_take_over( void *ptr, const char *func, const char *file, int line ) {
       e->file=file;
       e->line=line;
     }
-    mc_list_unlock(MEMLIST);
+
     return ptr;
   } else {
     return ptr;
@@ -127,10 +125,9 @@ void _mc_take_control( void *ptr, size_t size, const char *func, const char *fil
     e->file=file;
     e->line=line;
     e->ptr=ptr;
-    mc_list_lock(MEMLIST);
-    mc_list_start_iter(MEMLIST,LIST_FIRST);
-    mc_list_prepend_iter(MEMLIST,e);
-    mc_list_unlock(MEMLIST);
+    char s[50];
+    sprintf(s,"%p", ptr);
+    mc_hash_put(MEMHASH, s, e);
   } else {
     // do nothing
   }
@@ -144,28 +141,35 @@ void *_mc_realloc( void *ptr, size_t size, const char *func, const char *file, i
       return _mc_malloc(size, func, file, line);
     }
   
-    mc_list_lock(MEMLIST);
-    mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
-    while (e != NULL && e->ptr != ptr) {
-      e = mc_list_next_iter(MEMLIST);
-    }
-  
+    char s[50];
+    sprintf(s,"%p",ptr);
+    mc_entry_t* e = mc_hash_get(MEMHASH, s);
+    //log_debug3("found pointer %p (e = %p)", ptr, e);
+    
     if (e == NULL) {
-      log_error5("Reallocation of unknown pointer %s,%s,%d with size %d",func,file,line,(int) size);
-      mc_list_unlock(MEMLIST);
+      log_error6("Reallocation of unknown pointer %p, %s,%s,%d with size %d",ptr,func,file,line,(int) size);
       return ptr;
     } else {
       void *p = realloc(ptr,size);
       if (p == NULL) {
         log_error5("Realloc of pointer %s,%s,%d with size %d results in NULL",e->func,e->file,e->line,(int) size);
       } else {
+        //log_debug4("ptr = %p, p = %p, s = %s", ptr, p, s);
+        e->ptr = NULL;
+        mc_hash_del(MEMHASH, s);
+        
+        mc_entry_t *e=(mc_entry_t *) malloc(sizeof(mc_entry_t));
+        
+        e->func=func;
+        e->file=file;
+        e->line=line;
+
         e->ptr = p;
         e->size = size;
-        /*e->func=func;
-        e->file=file;
-        e->line=line;*/
+
+        sprintf(s,"%p",p);
+        mc_hash_put(MEMHASH, s, e);
       }
-      mc_list_unlock(MEMLIST);
       return p;
     }
   } else {
@@ -183,10 +187,9 @@ void *_mc_calloc( size_t num, size_t size, const char *func, const char *file, i
     e->file=file;
     e->line=line;
     e->ptr=p;
-    mc_list_lock(MEMLIST);
-    mc_list_start_iter(MEMLIST,LIST_FIRST);
-    mc_list_prepend_iter(MEMLIST,e);
-    mc_list_unlock(MEMLIST);
+    char s[50];
+    sprintf(s,"%p",p);
+    mc_hash_put(MEMHASH, s, e);
     return p;
   } else {
     return calloc(num, size);
@@ -220,24 +223,21 @@ char *_mc_strndup(const char* s, int n, const char* func, const char* file, int 
 
 void _mc_free( void * ptr, const char *func, const char *file, int line  ) {
   if (enabled) {
+    //log_debug3("mc_free %p %s\n",ptr, func);
     mc_check_init();
   
     if (ptr == NULL) return;
   
-    mc_list_lock(MEMLIST);
-    mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
-  
-    while (e != NULL && e->ptr != ptr) {
-      e = mc_list_next_iter(MEMLIST);
-    }
-  
+    char s[50];
+    sprintf(s,"%p",ptr);
+    mc_entry_t* e = mc_hash_get(MEMHASH, s);
+
     if (e == NULL) {
       log_error4("free of pointer %s, %s, %d: not in list, double free!",func,file,line);
     } else {
-      mc_list_drop_iter(MEMLIST);
+      mc_hash_del(MEMHASH, s);
     }
   
-    mc_list_unlock(MEMLIST);
   } else {
     free(ptr);
   }
@@ -247,12 +247,14 @@ void mc_report(void) {
   mc_check_init();
   int count=0;
   size_t total=0;
-  mc_entry_t *e=mc_list_start_iter(MEMLIST,LIST_FIRST);
-  while (e != NULL) {
+  
+  hash_iter_t it = mc_hash_iter(MEMHASH);
+  while (!mc_hash_iter_end(it)) {
+    mc_entry_t *e=mc_hash_iter_data(it);
     count += 1;
     total += e->size;
     log_error4("not freed: pointer allocated at %s, %s, %d",e->func,e->file,e->line);
-    e = mc_list_next_iter(MEMLIST);
+    it = mc_hash_iter_next(it);
   }
 
   if (count>0) {

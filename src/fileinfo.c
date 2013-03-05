@@ -1,10 +1,24 @@
 #include <elementals/memcheck.h>
 #include <elementals/fileinfo.h>
 #include <elementals/regexp.h>
+#include <elementals/log.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <dirent.h>
+
+static file_info_t* copy(file_info_t* info)
+{
+  return file_info_new(file_info_path(info));
+}
+
+static void destroy(file_info_t* info)
+{
+  file_info_destroy(info);
+}
+
+IMPLEMENT_EL_ARRAY(file_info_array, file_info_t, copy, destroy);
 
 #define SEP '/'
 #define STRSEP "/"
@@ -30,8 +44,13 @@ file_info_t *file_info_new(const char *path)
   info->path = mc_strdup(path);
   
   int i;
-  for(i=strlen(info->path)-1;i >= 0 && info->path[i] != '.';--i);
-  info->ext = mc_strdup(&info->path[i+1]);
+  for(i=strlen(info->path)-1;i >= 0 && info->path[i] != '.' && !is_sep(info->path[i]);--i);
+  if (i>=0 && is_sep(info->path[i])) {
+    info->ext = mc_strdup("");
+    i = strlen(info->path)-1;
+  } else {
+    info->ext = mc_strdup(&info->path[i+1]);
+  }
   
   int k;
   for(k = i;k >= 0 && !is_sep(info->path[k]); --k);
@@ -46,11 +65,14 @@ file_info_t *file_info_new(const char *path)
     info->filename = mc_strdup("");
   }
   
+  //log_debug3("path = %s, k = %d", info->path, k);
   if (k >= 0) {
     char h = info->path[k];
     info->path[k] = '\0';
     info->dirname = mc_strdup(info->path);
     info->path[k] = h;
+  } else {
+    info->dirname = mc_strdup("");
   }
   
   info->absolute_path = realpath(info->path, NULL);
@@ -74,32 +96,32 @@ file_info_t *file_info_new(const char *path)
   return info;
 }
 
-const char* file_info_absolute_path(file_info_t* info) 
+const char* file_info_absolute_path(const file_info_t* info) 
 {
   return info->absolute_path;
 }
 
-const char* file_info_ext(file_info_t* info)
+const char* file_info_ext(const file_info_t* info)
 {
   return info->ext;
 }
 
-const char* file_info_path(file_info_t* info)
+const char* file_info_path(const file_info_t* info)
 {
   return info->path;
 }
 
-const char* file_info_basename(file_info_t* info)
+const char* file_info_basename(const file_info_t* info)
 {
   return info->basename;
 }
 
-const char* file_info_dirname(file_info_t* info)
+const char* file_info_dirname(const file_info_t* info)
 {
   return info->dirname;
 }
 
-const char* file_info_filename(file_info_t* info)
+const char* file_info_filename(const file_info_t* info)
 {
   return info->filename;
 }
@@ -115,12 +137,12 @@ void file_info_destroy(file_info_t* info)
   mc_free(info);
 }
 
-el_bool file_info_exists(file_info_t* info)
+el_bool file_info_exists(const file_info_t* info)
 {
   return access(info->absolute_path, F_OK) == 0;
 }
 
-el_bool file_info_is_dir(file_info_t* info)
+el_bool file_info_is_dir(const file_info_t* info)
 {
   struct stat st;
   stat(info->absolute_path, &st);
@@ -130,7 +152,7 @@ el_bool file_info_is_dir(file_info_t* info)
   }
 }
 
-el_bool file_info_is_file(file_info_t* info)
+el_bool file_info_is_file(const file_info_t* info)
 {
   struct stat st;
   stat(info->absolute_path, &st);
@@ -140,17 +162,17 @@ el_bool file_info_is_file(file_info_t* info)
   }
 }
 
-el_bool file_info_can_read(file_info_t* info)
+el_bool file_info_can_read(const file_info_t* info)
 {
   return access(info->absolute_path, R_OK) == 0;
 }
 
-el_bool file_info_can_write(file_info_t* info)
+el_bool file_info_can_write(const file_info_t* info)
 {
   return access(info->absolute_path, W_OK) == 0;
 }
 
-time_t file_info_mtime(file_info_t* info)
+time_t file_info_mtime(const file_info_t* info)
 {
   struct stat st;
   if (!stat(info->absolute_path, &st)) {
@@ -160,7 +182,7 @@ time_t file_info_mtime(file_info_t* info)
   }
 }
 
-size_t file_info_size(file_info_t* info)
+size_t file_info_size(const file_info_t* info)
 {
   struct stat st;
   if (!stat(info->absolute_path, &st)) {
@@ -168,6 +190,71 @@ size_t file_info_size(file_info_t* info)
   } else {
     return 0;
   }
+}
+
+file_info_t* file_info_combine(const file_info_t* info, const char* name)
+{
+  int len = strlen(file_info_absolute_path(info)) + strlen(STRSEP) + strlen(name) + 1;
+  char* s = (char*) mc_malloc(len);
+  strcpy(s, file_info_path(info));
+  int i = strlen(s) - 1;
+  if (i < 0 || !is_sep(s[i])) { strcat(s, STRSEP); }
+  strcat(s, name);
+  
+  file_info_t* result = file_info_new(s);
+  mc_free(s);
+  
+  return result;
+}
+
+file_info_array file_info_scandir(const file_info_t* info, hre_t path_regexp)
+{
+  file_info_array matches = file_info_array_new();
+  if (file_info_is_dir(info)) {
+    DIR* dirh = opendir(file_info_absolute_path(info));
+    if (dirh != NULL) {
+      struct dirent entry;
+      struct dirent *result;
+      
+      while (readdir_r(dirh, &entry, &result) == 0 && result != NULL) {
+        if (hre_has_match(path_regexp, entry.d_name)) {
+          file_info_t* e = file_info_combine(info, entry.d_name);
+          file_info_array_append(matches, e);
+          file_info_destroy(e);
+        } 
+      }
+      
+      closedir(dirh);
+    }
+  }
+  return matches;
+}
+
+file_info_array file_info_subdirs(const file_info_t* info) 
+{
+  file_info_array matches = file_info_array_new();
+  if (file_info_is_dir(info)) {
+    DIR* dirh = opendir(file_info_absolute_path(info));
+    if (dirh != NULL) {
+      struct dirent entry;
+      struct dirent *result;
+      
+      while (readdir_r(dirh, &entry, &result) == 0 && result != NULL) {
+        file_info_t* e = mc_take_over(file_info_combine(info, entry.d_name));
+        if (file_info_is_dir(e)) {
+          if (strcmp(file_info_filename(e),".") != 0 &&
+              strcmp(file_info_filename(e),"..") != 0) {
+            //log_debug2("adding %s\n", file_info_path(e));
+            file_info_array_append(matches, e);
+          }
+        } 
+        file_info_destroy(e);
+      }
+      
+      closedir(dirh);
+    }
+  }
+  return matches;
 }
 
 

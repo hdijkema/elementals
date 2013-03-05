@@ -22,6 +22,15 @@
 
 #include <pthread.h>
 #include <elementals/list.h>
+#ifndef MEMCHECK_INTERNAL
+  #define __hash__hod_static
+#else
+  #define __hash__hod_static static
+  #ifdef USE_MEMCHECK
+    #undef USE_MEMCHECK
+  #endif
+#endif
+
 
 typedef void * hash_data_t;
 
@@ -61,31 +70,35 @@ typedef struct {
 #define HASH_CASE_SENSITIVE 1
 #define HASH_CASE_INSENSITIVE 0
 
+#ifdef MEMCHECK_INTERNAL
+STATIC_DECLARE_LIST(hash_key_list,const char);
+#else
 DECLARE_LIST(hash_key_list,const char);
+#endif
 
 typedef int (*hash_key_cmp)(const char *, const char *);
 
-hash_t *    _hash_new(int initial_table_size, int case_sensitive);
-void        _hash_destroy(hash_t *hash, void (*data_destroyer)(hash_data_t));
+__hash__hod_static hash_t *    _hash_new(int initial_table_size, int case_sensitive);
+__hash__hod_static void        _hash_destroy(hash_t *hash, void (*data_destroyer)(hash_data_t));
 
-void        _hash_put(hash_t *hash, const char *key, hash_data_t data,void (*data_destroyer)(hash_data_t));
-int         _hash_exists(hash_t *hash, const char *key);
-hash_data_t _hash_get(hash_t *hash, const char *key);
-void        _hash_del(hash_t *hash, const char *key, void (*data_destroyer)(hash_data_t));
+__hash__hod_static void        _hash_put(hash_t *hash, const char *key, hash_data_t data,void (*data_destroyer)(hash_data_t));
+__hash__hod_static int         _hash_exists(hash_t *hash, const char *key);
+__hash__hod_static hash_data_t _hash_get(hash_t *hash, const char *key);
+__hash__hod_static void        _hash_del(hash_t *hash, const char *key, void (*data_destroyer)(hash_data_t));
 
-hash_iter_t _hash_iter(hash_t *hash);
-hash_iter_t _hash_iter_next(hash_iter_t it);
-int         _hash_iter_end(hash_iter_t it);
-const char *_hash_iter_key(hash_iter_t it);
-hash_data_t _hash_iter_data(hash_iter_t it);
-void        _hash_iter_set_data(hash_iter_t it, hash_data_t data, void (*data_destroyer)(hash_data_t));
+__hash__hod_static hash_iter_t _hash_iter(hash_t *hash);
+__hash__hod_static hash_iter_t _hash_iter_next(hash_iter_t it);
+__hash__hod_static int         _hash_iter_end(hash_iter_t it);
+__hash__hod_static const char *_hash_iter_key(hash_iter_t it);
+__hash__hod_static hash_data_t _hash_iter_data(hash_iter_t it);
+__hash__hod_static void        _hash_iter_set_data(hash_iter_t it, hash_data_t data, void (*data_destroyer)(hash_data_t));
 
-int         _hash_count(hash_t *hash);
-int         _hash_table_size(hash_t *hash);
-int         _hash_collisions(hash_t *hash);
+__hash__hod_static int         _hash_count(hash_t *hash);
+__hash__hod_static int         _hash_table_size(hash_t *hash);
+__hash__hod_static int         _hash_collisions(hash_t *hash);
 
-hash_key_list * _hash_keys(hash_t *hash);
-hash_key_cmp    _hash_key_cmp();
+__hash__hod_static hash_key_list * _hash_keys(hash_t *hash);
+__hash__hod_static hash_key_cmp    _hash_key_cmp();
 
 
 #define __DECLARE_HASH(MODIFIER,NAME,T) \
@@ -132,6 +145,9 @@ hash_key_cmp    _hash_key_cmp();
 
 #define STATIC_DECLARE_HASH(NAME, T) __DECLARE_HASH(static, NAME, T)
 #define STATIC_IMPLEMENT_HASH(NAME, T, COPY, DESTROY) __IMPLEMENT_HASH(static, NAME, T, COPY, DESTROY)
+
+#define DECLARE_STATIC_HASH(NAME, T) __DECLARE_HASH(static, NAME, T)
+#define IMPLEMENT_STATIC_HASH(NAME, T, COPY, DESTROY) __IMPLEMENT_HASH(static, NAME, T, COPY, DESTROY)
 
 #endif
 
