@@ -15,5 +15,6 @@ void set_destroy(set_t* set);
 void set_put(set_t* set, const char* key);
 el_bool set_contains(set_t* set, const char* key);
 void set_del(set_t* set, const char* key);
+void set_clear(set_t* set);
 
 #endif

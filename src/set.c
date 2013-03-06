@@ -24,6 +24,11 @@ void set_destroy(set_t* set)
   set_hash_destroy((set_hash*) set);
 }
 
+void set_clear(set_t* set)
+{
+  set_hash_clear((set_hash*) set);
+}
+
 void set_put(set_t* set, const char* key)
 {
   set_hash_put((set_hash*) set, key, NULL);
