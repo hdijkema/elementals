@@ -156,6 +156,15 @@ __hash__hod_static hash_t *_hash_new(int initial_table_size,int case_sensitive) 
 
 __hash__hod_static void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data_t)) {
   log_assert(h!=NULL);
+  _hash_clear(h, data_destroyer);
+  pthread_mutex_destroy(h->mutex);
+  mc_free(h->mutex);
+  mc_free(h->table);
+  mc_free(h);
+}
+
+__hash__hod_static void _hash_clear(hash_t *h,void (*data_destroyer)(hash_data_t)) {
+  log_assert(h!=NULL);
   int i,N;
   for(i=0,N=h->table_size;i<N;i++) {
     struct __hash_elem__  *e=&h->table[i];
@@ -174,10 +183,12 @@ __hash__hod_static void _hash_destroy(hash_t *h,void (*data_destroyer)(hash_data
       mc_free(e->kds.datas);
     }
   }
-  pthread_mutex_destroy(h->mutex);
-  mc_free(h->mutex);
   mc_free(h->table);
-  mc_free(h);
+  N=next_prime(10);
+  h->table=(struct __hash_elem__ *) mc_calloc(N,sizeof(struct __hash_elem__));
+  h->count=0;
+  h->collisions=0;
+  h->table_size=N;
 }
 
 __hash__hod_static void _hash_put(hash_t *h, const char *key, hash_data_t data,

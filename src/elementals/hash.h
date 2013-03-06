@@ -82,6 +82,8 @@ typedef int (*hash_key_cmp)(const char *, const char *);
 __hash__hod_static hash_t *    _hash_new(int initial_table_size, int case_sensitive);
 __hash__hod_static void        _hash_destroy(hash_t *hash, void (*data_destroyer)(hash_data_t));
 
+__hash__hod_static void        _hash_clear(hash_t* hash, void (*data_destroyer)(hash_data_t));
+
 __hash__hod_static void        _hash_put(hash_t *hash, const char *key, hash_data_t data,void (*data_destroyer)(hash_data_t));
 __hash__hod_static int         _hash_exists(hash_t *hash, const char *key);
 __hash__hod_static hash_data_t _hash_get(hash_t *hash, const char *key);
@@ -106,6 +108,7 @@ __hash__hod_static hash_key_cmp    _hash_key_cmp();
   typedef hash_t  NAME; \
   MODIFIER inline NAME *          NAME##_new(int size,int case_sensitive); \
   MODIFIER inline void            NAME##_destroy(NAME *h); \
+  MODIFIER inline void            NAME##_clear(NAME* h); \
   MODIFIER inline void            NAME##_put(NAME *h,const char *key,T *e); \
   MODIFIER inline void            NAME##_del(NAME *h,const char *key); \
   MODIFIER inline T *             NAME##_get(NAME *h,const char *key); \
@@ -125,6 +128,7 @@ __hash__hod_static hash_key_cmp    _hash_key_cmp();
 #define __IMPLEMENT_HASH(MODIFIER,NAME,T,COPY,DESTROY) \
   MODIFIER inline NAME *          NAME##_new(int size, int case_sensitive) { return (NAME *) _hash_new(size,case_sensitive); } \
   MODIFIER inline void            NAME##_destroy(NAME *h) { _hash_destroy((hash_t *) h, (void (*) (void*)) DESTROY); } \
+  MODIFIER inline void            NAME##_clear(NAME* h) { _hash_clear((hash_t*) h, (void (*)(void*)) DESTROY); } \
   MODIFIER inline void            NAME##_put(NAME *h, const char *key,T *e) { _hash_put((hash_t *) h,key,COPY(e), (void (*) (void*)) DESTROY); } \
   MODIFIER inline void            NAME##_del(NAME *h, const char *key) { _hash_del((hash_t *) h,key, (void (*) (void*)) DESTROY); } \
   MODIFIER inline T *             NAME##_get(NAME *h, const char *key) { return (T *) _hash_get((hash_t *) h, key); } \
