@@ -80,7 +80,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 libelementals_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_libelementals_la_OBJECTS = crc.lo hash.lo list.lo log.lo \
+am_libelementals_la_OBJECTS = crc.lo hash.lo set.lo list.lo log.lo \
 	memblock.lo array.lo memcheck.lo fileinfo.lo regexp.lo
 libelementals_la_OBJECTS = $(am_libelementals_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -256,6 +256,7 @@ lib_LTLIBRARIES = libelementals.la
 libelementals_la_SOURCES = \
 	crc.c \
 	hash.c \
+	set.c \
 	list.c \
 	log.c \
 	memblock.c \
@@ -276,6 +277,7 @@ EXTRA_DIST = \
 include_HEADERS = elementals.h 
 otherincludedir = $(includedir)/elementals
 otherinclude_HEADERS = elementals/hash.h \
+	elementals/set.h \
 	elementals/crc.h \
 	elementals/list.h \
 	elementals/fifo.h \
@@ -373,6 +375,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memblock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memcheck.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regexp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/set.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

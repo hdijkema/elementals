@@ -8,6 +8,7 @@
 #include <elementals/list.h>
 #include <elementals/fifo.h>
 #include <elementals/hash.h>
+#include <elementals/set.h>
 #include <elementals/crc.h>
 #include <elementals/memblock.h>
 #include <elementals/array.h>

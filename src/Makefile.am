@@ -18,6 +18,7 @@ lib_LTLIBRARIES = libelementals.la
 libelementals_la_SOURCES =  \
 	crc.c \
 	hash.c \
+	set.c \
 	list.c \
 	log.c \
 	memblock.c \
@@ -41,6 +42,7 @@ include_HEADERS = elementals.h
 	
 otherincludedir = $(includedir)/elementals
 otherinclude_HEADERS = elementals/hash.h \
+	elementals/set.h \
 	elementals/crc.h \
 	elementals/list.h \
 	elementals/fifo.h \
