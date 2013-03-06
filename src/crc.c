@@ -18,6 +18,7 @@
    ********************************************************************
 */
 #include <elementals/crc.h>
+#include <ctype.h>
 
 static unsigned long crc_table[256];
 
@@ -40,6 +41,18 @@ unsigned long str_crc32(const char *buf) {
     unsigned long c = 0xFFFFFFFF;
     for (;*buf!='\0';buf++) {
       unsigned char b=(unsigned char) *buf;
+        c = crc_table[(c ^ b) & 0xFF] ^ (c >> 8);
+    }
+    return c ^ 0xFFFFFFFF;
+}
+
+unsigned long str_case_crc32(const char* buf) {
+  static int init=1;
+  if (init) { make_crc_table();init=0; }
+
+    unsigned long c = 0xFFFFFFFF;
+    for (;*buf!='\0';buf++) {
+      unsigned char b=(unsigned char) tolower(*buf);
         c = crc_table[(c ^ b) & 0xFF] ^ (c >> 8);
     }
     return c ^ 0xFFFFFFFF;

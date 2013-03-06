@@ -109,11 +109,80 @@ int _el_array_count(el_array_t *a)
 void _el_array_destroy(el_array_t* a, void (*destroyer)(void *))
 {
   log_assert(a != NULL);
-  while(a->count > 0) {
-    _el_array_delete(a, 0, destroyer);
-  }
+  _el_array_clear(a, destroyer);
   mc_free(a->array);
   mc_free(a);
 }
 
+void _el_array_clear(el_array_t* a, void (*destroyer)(void *))
+{
+  log_assert(a != NULL);
+  while (a->count > 0) {
+    _el_array_delete(a, a->count - 1, destroyer);
+  }
+}
+
+el_array_t* _el_array_copy(el_array_t* source, void* (*copy)(void*)) {
+  el_array_t* a = _el_array_new();
+  int i, N;
+  for(i = 0, N = _el_array_count(source); i < N; ++i) {
+    _el_array_insert(a, i, copy(_el_array_get(source, i)));
+  }
+  return a;
+}
+
+static void mergeSort(void* arr[],int low, int mid, int high, int (*cmp)(void*,void*))
+{
+  int i,m,k,l;
+  void** temp = (void**) mc_malloc((high+1) * sizeof(void*));
+
+  l=low;
+  i=low;
+  m=mid+1;
+  while((l <= mid) && (m <= high)) {
+    int cr = cmp(arr[l], arr[m]);
+    if (cr <= 0) {
+      temp[i]=arr[l];
+      ++l;
+    } else {
+      temp[i] = arr[m];
+      ++m;
+    }
+    ++i;
+  }
+
+  if (l > mid){
+    for(k = m;k <= high; ++k){
+      temp[i] = arr[k];
+      ++i;
+    }
+  } else {
+    for(k = l;k <= mid; ++k){
+      temp[i] = arr[k];
+      ++i;
+    }
+  }
+ 
+  for(k = low;k <= high; ++k){
+    arr[k] = temp[k];
+  }
+  
+  mc_free(temp);
+}
+
+static void partition(void *arr[],int low,int high, int (*cmp)(void*,void*))
+{
+  int mid;
+  if (low < high) {
+    mid = (low + high) / 2;
+    partition(arr, low, mid, cmp);
+    partition(arr, mid+1, high, cmp);
+    mergeSort(arr, low, mid, high, cmp);
+  }
+}
+
+void _el_array_sort(el_array_t* a, int (*cmp)(void* a, void* b))
+{
+  partition(a->array, 0, a->count - 1, cmp);
+}
 

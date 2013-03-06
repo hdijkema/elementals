@@ -146,6 +146,7 @@ __hash__hod_static hash_t *_hash_new(int initial_table_size,int case_sensitive) 
 
     h->mutex=(pthread_mutex_t *) mc_malloc(sizeof(pthread_mutex_t));
     h->eq=(case_sensitive) ? eq_case_sensitive : eq_case_insensitive;
+    h->crc=(case_sensitive) ? str_crc32 : str_case_crc32;
     pthread_mutex_init(h->mutex,NULL);
     return h;
   } else {
@@ -194,7 +195,7 @@ __hash__hod_static void hash_put1(hash_t *h,const char *key,hash_data_t data,
 
 	check_resize (h, data_destroyer);
 
-  int index=str_crc32(key) % h->table_size;
+  int index=h->crc(key) % h->table_size;
   struct __hash_elem__ *e = &h->table[index];
 
   if (e->count == 0) {
@@ -247,7 +248,7 @@ __hash__hod_static hash_data_t _hash_get(hash_t *h, const char *key)
   log_assert(h!=NULL);
   pthread_mutex_lock(h->mutex);
 
-  int index=str_crc32(key)%h->table_size;
+  int index=h->crc(key)%h->table_size;
   struct __hash_elem__ *e=&h->table[index];
 
   hash_data_t result;
@@ -280,7 +281,7 @@ __hash__hod_static void _hash_del(hash_t *h, const char *key, void (*data_destro
   log_assert(h!=NULL);
   pthread_mutex_lock(h->mutex);
 
-  int index=str_crc32(key)%h->table_size;
+  int index=h->crc(key)%h->table_size;
   struct __hash_elem__ *e=&h->table[index];
 
   if (e->count == 0) {

@@ -55,6 +55,7 @@ typedef struct {
   int collisions;
   int update_count;
   int (*eq)(const char *k1,const char *k2);
+  unsigned long (*crc)(const char* key);
   pthread_mutex_t *mutex;
 } hash_t;
 
