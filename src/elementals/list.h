@@ -50,7 +50,10 @@ typedef struct {
   int count;
 } list_t;
 
-typedef enum { LIST_LAST, LIST_FIRST } list_pos_t;
+typedef enum { 
+  LIST_LAST, 
+  LIST_FIRST 
+} list_pos_t;
 
 __list__hod_static list_t *  _list_new();
 __list__hod_static void      _list_destroy(list_t *,void (*data_destroyer)(list_data_t v));

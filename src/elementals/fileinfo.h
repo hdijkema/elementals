@@ -34,6 +34,7 @@ el_bool file_info_is_dir(const file_info_t* info);
 el_bool file_info_is_file(const file_info_t* info);
 el_bool file_info_can_read(const file_info_t* info);
 el_bool file_info_can_write(const file_info_t* info);
+el_bool file_info_is_absolute(const file_info_t* info);
 
 time_t file_info_mtime(const file_info_t* info);
 size_t file_info_size(const file_info_t* info);

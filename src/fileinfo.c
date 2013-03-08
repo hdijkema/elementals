@@ -162,6 +162,11 @@ el_bool file_info_is_file(const file_info_t* info)
   }
 }
 
+el_bool file_info_is_absolute(const file_info_t* info)
+{
+  return info->path[0] == SEP;
+}
+
 el_bool file_info_can_read(const file_info_t* info)
 {
   return access(info->absolute_path, R_OK) == 0;

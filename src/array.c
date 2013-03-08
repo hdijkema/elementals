@@ -131,8 +131,11 @@ el_array_t* _el_array_copy(el_array_t* source, void* (*copy)(void*)) {
   return a;
 }
 
-static void mergeSort(void* arr[],int low, int mid, int high, int (*cmp)(void*,void*))
+static void mergeSort(void* arr[],int low, int mid, int high, void* cmp, el_bool dt, void* data)
 {
+  int (*cmp1)(void*,void*) = (int (*)(void*, void*)) cmp;
+  int (*cmp2)(void*,void*,void*) = (int (*)(void*,void*,void*)) cmp;
+  
   int i,m,k,l;
   void** temp = (void**) mc_malloc((high+1) * sizeof(void*));
 
@@ -140,7 +143,7 @@ static void mergeSort(void* arr[],int low, int mid, int high, int (*cmp)(void*,v
   i=low;
   m=mid+1;
   while((l <= mid) && (m <= high)) {
-    int cr = cmp(arr[l], arr[m]);
+    int cr = (dt) ? cmp2(data, arr[l], arr[m]) : cmp1(arr[l], arr[m]);
     if (cr <= 0) {
       temp[i]=arr[l];
       ++l;
@@ -170,19 +173,24 @@ static void mergeSort(void* arr[],int low, int mid, int high, int (*cmp)(void*,v
   mc_free(temp);
 }
 
-static void partition(void *arr[],int low,int high, int (*cmp)(void*,void*))
+static void partition(void *arr[],int low,int high, void* cmp, el_bool dt, void* data)
 {
   int mid;
   if (low < high) {
     mid = (low + high) / 2;
-    partition(arr, low, mid, cmp);
-    partition(arr, mid+1, high, cmp);
-    mergeSort(arr, low, mid, high, cmp);
+    partition(arr, low, mid, cmp, dt, data);
+    partition(arr, mid+1, high, cmp, dt, data);
+    mergeSort(arr, low, mid, high, cmp, dt, data);
   }
 }
 
 void _el_array_sort(el_array_t* a, int (*cmp)(void* a, void* b))
 {
-  partition(a->array, 0, a->count - 1, cmp);
+  partition(a->array, 0, a->count - 1, cmp, el_false, NULL);
 }
 
+
+void _el_array_sort1(el_array_t* a, void* data, int(*cmp)(void* data, void* a, void* b))
+{
+  partition(a->array, 0, a->count - 1, cmp, el_true, data);
+}
