@@ -96,6 +96,11 @@ file_info_t *file_info_new(const char *path)
   return info;
 }
 
+el_bool file_info_is_hidden(const file_info_t* info)
+{
+  return file_info_filename(info)[0] == '.';
+}
+
 const char* file_info_absolute_path(const file_info_t* info) 
 {
   return info->absolute_path;

@@ -29,4 +29,8 @@ void        memblock_destroy(memblock_t *blk);
 size_t      memblock_size(memblock_t *blk);
 off_t       memblock_pos(memblock_t *blk);
 
+// beware! memblock needs to be '\0' terminated!
+const char* memblock_as_str(memblock_t* blk);
+void memblock_concat(memblock_t* blk, const char* str);
+
 #endif

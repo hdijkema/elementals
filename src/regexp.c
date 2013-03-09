@@ -299,3 +299,17 @@ const char* hre_match_str(hre_match_t* m) {
 void hre_match_destroy(hre_match_t* m) {
   hre_destroy_match(m);
 }
+
+void hre_lc(char* s) 
+{
+  for(;*s != '\0'; ++s) {
+    *s = tolower(*s);
+  }
+}
+
+void hre_uc(char* s)
+{
+  for(;*s != '\0'; ++s) {
+    *s = toupper(*s);
+  }
+}

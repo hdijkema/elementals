@@ -33,11 +33,15 @@ char* hre_replace_all(hre_t re, const char* string, const char* replacement);
 void hre_destroy(hre_t re);
 
 void hre_trim(char* string);
+void hre_lc(char* string);
+void hre_uc(char* string);
+
 char* hre_left(const char* string, int l);
 char* hre_substr(const char* string, int offset, int len);
 char* hre_right(const char* string, int l);
 char* hre_concat(const char* s1, const char *s2);
 char* hre_concat3(const char* s1, const char* s2, const char* s3);
+
 
 
 #endif

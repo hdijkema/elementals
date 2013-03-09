@@ -68,4 +68,15 @@ off_t memblock_pos(memblock_t *blk) {
 }
 
 
+const char* memblock_as_str(memblock_t* blk)
+{
+  return blk->block;
+}
+
+void memblock_concat(memblock_t* blk, const char* s)
+{
+  memblock_write(blk, s, strlen(s));
+}
+
+
 
