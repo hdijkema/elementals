@@ -264,12 +264,14 @@ void hre_trim(char* string)
 {
   char* p=(char*) string;
   while(p[0] != '\0' && isspace(p[0])) { ++p; }
-  if (p[0] != '\0') {
+  if (p[0] == '\0') {
+    string[0] = '\0';
+  } else {
     int i, l;
     for(l = strlen(p),i = l - 1;i >= 0 && isspace(p[i]);--i);
     memmove(string, p, i+2);
     string[i+1]='\0';
-  }  
+  }
 }
 
 int hre_match_begin(hre_match_t *m) {

@@ -32,10 +32,15 @@ file_info_t *file_info_new_home(const char* file)
 {
   const char* home=getenv("HOME");
   if (home == NULL) { home = "."; }
-  char* full = hre_concat3(home, STRSEP, file);
-  file_info_t* info = file_info_new(full);
-  mc_free(full);
-  return info;
+  if (file != NULL) {
+    char* full = hre_concat3(home, STRSEP, file);
+    file_info_t* info = file_info_new(full);
+    mc_free(full);
+    return info;
+  } else {
+    file_info_t* info = file_info_new(home);
+    return info;
+  }
 }
 
 file_info_t *file_info_new(const char *path) 
