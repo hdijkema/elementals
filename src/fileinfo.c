@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <errno.h>
 #include <dirent.h>
 
@@ -267,4 +268,37 @@ file_info_array file_info_subdirs(const file_info_t* info)
   return matches;
 }
 
-
+el_bool file_info_mkdir_p(const file_info_t* info, mode_t mode)
+{
+  if (file_info_is_dir(info)) { 
+    return el_true;
+  }
+  
+  const char* dirname = file_info_dirname(info);
+  if (strcmp(dirname, "") == 0) {
+    return el_false; 
+  }
+  
+  file_info_t* d = file_info_new(dirname);
+  if (file_info_is_dir(d)) {
+    file_info_t* dn = file_info_combine(d, file_info_filename(info));
+    int r = mkdir(file_info_absolute_path(dn), mode);
+    file_info_destroy(dn);
+    file_info_destroy(d);
+    return (r >= 0);
+  } else {
+    if (file_info_exists(d)) {
+      file_info_destroy(d);
+      return el_false;
+    } else {
+      if (file_info_mkdir_p(d, mode)) {
+        el_bool r = file_info_mkdir_p(info, mode);
+        file_info_destroy(d);
+        return r;
+      } else {
+        file_info_destroy(d);
+        return el_false;
+      }
+    }
+  }
+} 

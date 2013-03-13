@@ -179,15 +179,11 @@ char* hre_replace_all(hre_t re,const char* string, const char* replacement)
   char **s = (char**) mc_malloc(sizeof(char*) * ((l+1)*2));
   int n, b = 0;
   for(n = 0, i = 0 ; i < l; ++i) {
-    //printf("%d\n",i);
     hre_match_t *match = hre_matches_get(m, i);
     int el = match->begin_offset - b;
-    //printf("%d - %d\n",b,el);
     s[n] = hre_substr(string, b, el);
-    //printf("'%s'\n",s[n]);
-    //el = match->end_offset - match->begin_offset;
-    s[n+1] = mc_strdup(replacement);//hre_substr(string, match->begin_offset, el);
-    //printf("'%s'\n",s[n+1]);
+    s[n+1] = mc_strdup(replacement);
+    log_debug3("%s, %s", s[n], s[n+1]);
     n += 2;
     b = match->end_offset;
   }
@@ -197,13 +193,13 @@ char* hre_replace_all(hre_t re,const char* string, const char* replacement)
   
   char* q = mc_strdup("");
   for(i=0; i < n; i++) {
-    //printf("%d = %s\n",i,s[i]);
     char* r = hre_concat(q, s[i]);
     mc_free(q);
     mc_free(s[i]);
     q = r;
   }
   mc_free(s);
+  log_debug2("q = %s", q);
   
   return q;
 }
@@ -271,7 +267,7 @@ void hre_trim(char* string)
   if (p[0] != '\0') {
     int i, l;
     for(l = strlen(p),i = l - 1;i >= 0 && isspace(p[i]);--i);
-    strncpy(string, p, i+2);
+    memmove(string, p, i+2);
     string[i+1]='\0';
   }  
 }

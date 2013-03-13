@@ -5,6 +5,8 @@
 #include <elementals/array.h>
 #include <elementals/regexp.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 typedef struct {
   char* path;
@@ -42,6 +44,8 @@ size_t file_info_size(const file_info_t* info);
 
 file_info_array file_info_scandir(const file_info_t* info, hre_t path_regexp);
 file_info_array file_info_subdirs(const file_info_t* info);
+
+el_bool file_info_mkdir_p(const file_info_t* info, mode_t mode);
 
 
 #endif
