@@ -1,11 +1,11 @@
 VERSION=$(shell ./get_version.sh)
 MYDIST=$(shell cat /etc/lsb-release | grep CODENAME | sed -e 's/[^=]*[=]//')
-SUBVERSION=5
+SUBVERSION=6
 PACKAGE=elementals
 DEPENDS=libpcre3
 DEPENDS1=
 BUILDDEPENDS=gawk,automake,autoconf,intltool,libpthread-stubs0-dev,libpcre3-dev,pkg-config
-DISTROS=natty oneiric precise quantal maverick lucid
+DISTROS=natty oneiric precise quantal lucid
 #DISTROS=precise
 DISTROS1=maverick lucid
 DVERSION=${VERSION}.${DISTRO}.${SUBVERSION}
