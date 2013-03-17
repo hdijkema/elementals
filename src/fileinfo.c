@@ -225,7 +225,7 @@ file_info_t* file_info_combine(const file_info_t* info, const char* name)
 
 file_info_array file_info_scandir(const file_info_t* info, hre_t path_regexp)
 {
-  file_info_array matches = file_info_array_new();
+  file_info_array matches = mc_take_over(file_info_array_new());
   if (file_info_is_dir(info)) {
     DIR* dirh = opendir(file_info_absolute_path(info));
     if (dirh != NULL) {
@@ -248,7 +248,7 @@ file_info_array file_info_scandir(const file_info_t* info, hre_t path_regexp)
 
 file_info_array file_info_subdirs(const file_info_t* info) 
 {
-  file_info_array matches = file_info_array_new();
+  file_info_array matches = mc_take_over(file_info_array_new());
   if (file_info_is_dir(info)) {
     DIR* dirh = opendir(file_info_absolute_path(info));
     if (dirh != NULL) {
