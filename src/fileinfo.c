@@ -99,7 +99,7 @@ file_info_t *file_info_new(const char *path)
     mc_take_control(info->absolute_path, strlen(info->absolute_path)+1);
   }
   
-  return info;
+  return mc_take_over(info);
 }
 
 el_bool file_info_is_hidden(const file_info_t* info)

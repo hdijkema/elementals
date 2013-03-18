@@ -42,7 +42,7 @@ void          _el_array_clear(el_array_t* a, void (*destroyer)(void*));
   MODIFIER inline void NAME##_destroy(NAME a);
 
 #define _IMPLEMENT_EL_ARRAY(MODIFIER, NAME, T, COPY, DESTROY) \
-  MODIFIER inline NAME NAME##_new(void)  { return (NAME) _el_array_new(); } \
+  MODIFIER inline NAME NAME##_new(void)  { return (NAME) mc_take_over(_el_array_new()); } \
   MODIFIER inline el_array_code NAME##_insert(NAME a, int index, T *elem) { return _el_array_insert( a, index, (void *) COPY(elem)); } \
   MODIFIER inline el_array_code NAME##_append(NAME a, T *elem) { return _el_array_insert(a, _el_array_count(a), (void*) COPY(elem)); } \
   MODIFIER inline el_array_code NAME##_delete(NAME a, int index) { return _el_array_delete(a, index, (void (*)(void*)) DESTROY); } \

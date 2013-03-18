@@ -62,7 +62,7 @@ hre_matches hre_match(hre_t re, const char *string)
     int *ovector = (int*) mc_malloc(sizeof(int) * ovec_len);
     res = pcre_exec((pcre*) re, NULL, string, strlen(string), 0, 0, ovector, ovec_len);
     if (res >= 0) {
-      hre_matches m = hre_matches_new();
+      hre_matches m = mc_take_over(hre_matches_new());
       int i;
       for(i = 0;i < res;++i) {
         int k=i*2;
@@ -81,17 +81,17 @@ hre_matches hre_match(hre_t re, const char *string)
       if (res != PCRE_ERROR_NOMATCH) {
         log_error2("pcre_exec returns error: %d", res);
       }
-      return hre_matches_new();
+      return mc_take_over(hre_matches_new());
     }
   } else {
     log_error2("pcre_fullinfo returns error: %d", res);
-    return hre_matches_new();
+    return mc_take_over(hre_matches_new());
   }
 }
 
 hre_matches hre_match_all(hre_t re, const char* string)
 {
-  hre_matches R = hre_matches_new();
+  hre_matches R = mc_take_over(hre_matches_new());
   hre_matches m = hre_match(re, string);
   
   while (hre_matches_count(m) > 0) {
@@ -120,7 +120,7 @@ hre_matches hre_match_all(hre_t re, const char* string)
 
 hre_matches hre_match_all0(hre_t re, const char* string)
 {
-  hre_matches R = hre_matches_new();
+  hre_matches R = mc_take_over(hre_matches_new());
   hre_matches m = hre_match(re, string);
   
   while (hre_matches_count(m) > 0) {
@@ -145,7 +145,7 @@ hre_matches hre_match_all0(hre_t re, const char* string)
 
 el_bool hre_has_match(hre_t re, const char* string)
 {
-  hre_matches m = hre_match(re, string);
+  hre_matches m = mc_take_over(hre_match(re, string));
   if (hre_matches_count(m) == 0) {
     hre_matches_destroy(m);
     return el_false;
@@ -168,6 +168,7 @@ char* hre_replace(hre_t re, const char* string, const char* replacement)
     hre_matches_destroy(m);
     return r;
   } else {
+    hre_matches_destroy(m);
     return mc_strdup(string);
   }
 }
