@@ -33,6 +33,7 @@ char* hre_replace_all(hre_t re, const char* string, const char* replacement);
 void hre_destroy(hre_t re);
 
 void hre_trim(char* string);
+char *hre_trim_copy(const char* str);
 void hre_lc(char* string);
 void hre_uc(char* string);
 

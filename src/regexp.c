@@ -184,7 +184,7 @@ char* hre_replace_all(hre_t re,const char* string, const char* replacement)
     int el = match->begin_offset - b;
     s[n] = hre_substr(string, b, el);
     s[n+1] = mc_strdup(replacement);
-    log_debug3("%s, %s", s[n], s[n+1]);
+    //log_debug3("%s, %s", s[n], s[n+1]);
     n += 2;
     b = match->end_offset;
   }
@@ -200,7 +200,7 @@ char* hre_replace_all(hre_t re,const char* string, const char* replacement)
     q = r;
   }
   mc_free(s);
-  log_debug2("q = %s", q);
+  //log_debug2("q = %s", q);
   
   return q;
 }
@@ -260,10 +260,30 @@ char* hre_right(const char* string, int len)
   return hre_substr(string, offset, len);
 }
 
+char* hre_trim_copy(const char* str)
+{
+  char* s = mc_strdup(str);
+  hre_trim(s);
+  return s;
+}
+
+inline el_bool is_utf8_start(char* cc)
+{
+  unsigned char* c = (unsigned char*) cc;
+  if (c[0] == 0xef) {
+    if (c[1] == 0xbb) {
+      if (c[2] == 0xbf) {
+        return el_true;
+      }
+    }
+  }
+  return el_false;
+}
 
 void hre_trim(char* string)
 {
   char* p=(char*) string;
+  if (is_utf8_start(p)) { p += 3; }
   while(p[0] != '\0' && isspace(p[0])) { ++p; }
   if (p[0] == '\0') {
     string[0] = '\0';

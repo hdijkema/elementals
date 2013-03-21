@@ -49,6 +49,7 @@ file_info_t *file_info_new(const char *path)
   
   info->path = mc_strdup(path);
   
+  // Extension
   int i;
   for(i=strlen(info->path)-1;i >= 0 && info->path[i] != '.' && !is_sep(info->path[i]);--i);
   if (i>=0 && is_sep(info->path[i])) {
@@ -58,6 +59,7 @@ file_info_t *file_info_new(const char *path)
     info->ext = mc_strdup(&info->path[i+1]);
   }
   
+  // basename
   int k;
   for(k = i;k >= 0 && !is_sep(info->path[k]); --k);
   if (i >= 0) {
@@ -70,8 +72,8 @@ file_info_t *file_info_new(const char *path)
     info->basename = mc_strdup("");
     info->filename = mc_strdup("");
   }
-  
-  //log_debug3("path = %s, k = %d", info->path, k);
+
+  // dirname  
   if (k >= 0) {
     char h = info->path[k];
     info->path[k] = '\0';
@@ -81,6 +83,7 @@ file_info_t *file_info_new(const char *path)
     info->dirname = mc_strdup("");
   }
   
+  // absolute path
   info->absolute_path = realpath(info->path, NULL);
   if (info->absolute_path == NULL) {
     if (strlen(info->dirname) > 0) {
@@ -92,7 +95,7 @@ file_info_t *file_info_new(const char *path)
     } else {
       char buf[10240];
       if (getcwd(buf,10240) == buf) {
-        info->absolute_path = mc_strdup(buf);
+        info->absolute_path = hre_concat3(buf, STRSEP, info->filename);
       }
     }
   } else {
@@ -210,11 +213,12 @@ size_t file_info_size(const file_info_t* info)
 
 file_info_t* file_info_combine(const file_info_t* info, const char* name)
 {
-  int len = strlen(file_info_absolute_path(info)) + strlen(STRSEP) + strlen(name) + 1;
+  int len = strlen(file_info_path(info)) + strlen(STRSEP) + strlen(name) + 1;
   char* s = (char*) mc_malloc(len);
+
   strcpy(s, file_info_path(info));
   int i = strlen(s) - 1;
-  if (i < 0 || !is_sep(s[i])) { strcat(s, STRSEP); }
+  if (i >= 0 && !is_sep(s[i])) { strcat(s, STRSEP); }
   strcat(s, name);
   
   file_info_t* result = file_info_new(s);

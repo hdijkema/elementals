@@ -37,8 +37,8 @@ el_array_code _el_array_insert(el_array_t *a, int index, void *type_elem)
         a->array = (void **) mc_realloc(a->array, (a->size+1) * sizeof(void *));
         log_assert(a->array != NULL);
         a->size  += 1;
-        a->count += 1;
       }
+      a->count += 1;
       int i;
       for(i = a->count-2; i >= index; --i) {
         a->array[i+1] = a->array[i];

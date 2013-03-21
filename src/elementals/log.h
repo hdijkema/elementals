@@ -21,6 +21,10 @@
 #ifndef __LOG__H
 #define __LOG__H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -44,7 +48,7 @@
 
 FILE * log_handle();
 void reset_log_handle_to_space(const char *space);
-inline int log_this_severity();
+int log_this_severity(int severity);
 
 #define log_flush() fseek(log_handle(),0,SEEK_END)
 
@@ -111,5 +115,10 @@ inline int log_this_severity();
 
 #define log_return(v)   return (log_debug2("return value=%d",v),v)
 #define log_return_st(v)  return (log_debug2("return value=%ld",v),v)
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
