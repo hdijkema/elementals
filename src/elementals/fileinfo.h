@@ -47,6 +47,8 @@ file_info_array file_info_subdirs(const file_info_t* info);
 
 el_bool file_info_mkdir_p(const file_info_t* info, mode_t mode);
 
+void file_info_blend(char* filename);
+
 
 #endif
 

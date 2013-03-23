@@ -311,3 +311,17 @@ el_bool file_info_mkdir_p(const file_info_t* info, mode_t mode)
     }
   }
 } 
+
+void file_info_blend(char *filename)
+{
+  int i;
+  for(i = 0; filename[i] != '\0'; ++i) {
+    if ((filename[i] >='0' && filename[i] <= '9') ||
+        (filename[i] >='a' && filename[i] <= 'z') ||
+        (filename[i] >='A' && filename[i] <= 'Z')) {
+      // do nothing
+    } else {
+      filename[i]='_';
+    }
+  }
+}
