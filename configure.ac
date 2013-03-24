@@ -21,10 +21,8 @@ dnl ***************************************************************************
 LT_INIT
 
 
-
-
-
-PKG_CHECK_MODULES(LIBPCRE,libpcre)
+#PKG_CHECK_MODULES(LIBPCRE,libpcre)
+AX_PATH_LIB_PCRE
 
 AC_OUTPUT([
 Makefile

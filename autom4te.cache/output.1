@@ -612,11 +612,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIB@&t@OBJS
-LIBPCRE_LIBS
-LIBPCRE_CFLAGS
-PKG_CONFIG_LIBDIR
-PKG_CONFIG_PATH
-PKG_CONFIG
+PCRE_CFLAGS
+PCRE_LIBS
 CPP
 OTOOL64
 OTOOL
@@ -741,6 +738,7 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+with_pcre
 '
       ac_precious_vars='build_alias
 host_alias
@@ -750,12 +748,7 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
-CPP
-PKG_CONFIG
-PKG_CONFIG_PATH
-PKG_CONFIG_LIBDIR
-LIBPCRE_CFLAGS
-LIBPCRE_LIBS'
+CPP'
 
 
 # Initialize some variables set by options.
@@ -1394,6 +1387,7 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld @<:@default=no@:>@
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
+  --with-pcre[=prefix]    compile xmlpcre part (via libpcre check)
 
 Some influential environment variables:
   CC          C compiler command
@@ -1404,15 +1398,6 @@ Some influential environment variables:
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
   CPP         C preprocessor
-  PKG_CONFIG  path to pkg-config utility
-  PKG_CONFIG_PATH 
-              directories to add to pkg-config's search path
-  PKG_CONFIG_LIBDIR 
-              path overriding pkg-config's built-in search path
-  LIBPCRE_CFLAGS 
-              C compiler flags for LIBPCRE, overriding pkg-config
-  LIBPCRE_LIBS 
-              linker flags for LIBPCRE, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -11240,220 +11225,148 @@ CC="$lt_save_CC"
 
 
 
+#PKG_CHECK_MODULES(LIBPCRE,libpcre)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking lib pcre" >&5
+$as_echo_n "checking lib pcre... " >&6; }
 
+@%:@ Check whether --with-pcre was given.
+if test "${with_pcre+set}" = set; then :
+  withval=$with_pcre; 
+else
+  with_pcre="yes"
+fi
 
-
-
-
-
-
-
-
-
-if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
-	if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
-set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_PKG_CONFIG+:} false; then :
+if test ".$with_pcre" = ".no" ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+$as_echo "disabled" >&6; }
+  
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: (testing)" >&5
+$as_echo "(testing)" >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pcre_study in -lpcre" >&5
+$as_echo_n "checking for pcre_study in -lpcre... " >&6; }
+if ${ac_cv_lib_pcre_pcre_study+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  case $PKG_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpcre  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-  ;;
-esac
-fi
-PKG_CONFIG=$ac_cv_path_PKG_CONFIG
-if test -n "$PKG_CONFIG"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
-$as_echo "$PKG_CONFIG" >&6; }
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pcre_study ();
+int
+main ()
+{
+return pcre_study ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_pcre_pcre_study=yes
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
+  ac_cv_lib_pcre_pcre_study=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pcre_pcre_study" >&5
+$as_echo "$ac_cv_lib_pcre_pcre_study" >&6; }
+if test "x$ac_cv_lib_pcre_pcre_study" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+@%:@define HAVE_LIBPCRE 1
+_ACEOF
+
+  LIBS="-lpcre $LIBS"
+
 fi
 
-
-fi
-if test -z "$ac_cv_path_PKG_CONFIG"; then
-  ac_pt_PKG_CONFIG=$PKG_CONFIG
-  # Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_ac_pt_PKG_CONFIG+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $ac_pt_PKG_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_ac_pt_PKG_CONFIG="$ac_pt_PKG_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_ac_pt_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-ac_pt_PKG_CONFIG=$ac_cv_path_ac_pt_PKG_CONFIG
-if test -n "$ac_pt_PKG_CONFIG"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_PKG_CONFIG" >&5
-$as_echo "$ac_pt_PKG_CONFIG" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_pt_PKG_CONFIG" = x; then
-    PKG_CONFIG=""
+  if test "$ac_cv_lib_pcre_pcre_study" = "yes" ; then
+     PCRE_LIBS="-lpcre"
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking lib pcre" >&5
+$as_echo_n "checking lib pcre... " >&6; }
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PCRE_LIBS" >&5
+$as_echo "$PCRE_LIBS" >&6; }
+     
   else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    PKG_CONFIG=$ac_pt_PKG_CONFIG
-  fi
+     OLDLDFLAGS="$LDFLAGS" ; LDFLAGS="$LDFLAGS -L$with_pcre/lib"
+     OLDCPPFLAGS="$CPPFLAGS" ; CPPFLAGS="$CPPFLAGS -I$with_pcre/include"
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pcre_compile in -lpcre" >&5
+$as_echo_n "checking for pcre_compile in -lpcre... " >&6; }
+if ${ac_cv_lib_pcre_pcre_compile+:} false; then :
+  $as_echo_n "(cached) " >&6
 else
-  PKG_CONFIG="$ac_cv_path_PKG_CONFIG"
-fi
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpcre  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-fi
-if test -n "$PKG_CONFIG"; then
-	_pkg_min_version=0.9.0
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking pkg-config is at least version $_pkg_min_version" >&5
-$as_echo_n "checking pkg-config is at least version $_pkg_min_version... " >&6; }
-	if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-		PKG_CONFIG=""
-	fi
-fi
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBPCRE" >&5
-$as_echo_n "checking for LIBPCRE... " >&6; }
-
-if test -n "$LIBPCRE_CFLAGS"; then
-    pkg_cv_LIBPCRE_CFLAGS="$LIBPCRE_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpcre\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libpcre") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBPCRE_CFLAGS=`$PKG_CONFIG --cflags "libpcre" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes 
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pcre_compile ();
+int
+main ()
+{
+return pcre_compile ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_pcre_pcre_compile=yes
 else
-  pkg_failed=yes
+  ac_cv_lib_pcre_pcre_compile=no
 fi
- else
-    pkg_failed=untried
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-if test -n "$LIBPCRE_LIBS"; then
-    pkg_cv_LIBPCRE_LIBS="$LIBPCRE_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpcre\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libpcre") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LIBPCRE_LIBS=`$PKG_CONFIG --libs "libpcre" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes 
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pcre_pcre_compile" >&5
+$as_echo "$ac_cv_lib_pcre_pcre_compile" >&6; }
+if test "x$ac_cv_lib_pcre_pcre_compile" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+@%:@define HAVE_LIBPCRE 1
+_ACEOF
+
+  LIBS="-lpcre $LIBS"
+
 fi
 
-
-
-if test $pkg_failed = yes; then
-   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
+     CPPFLAGS="$OLDCPPFLAGS"
+     LDFLAGS="$OLDLDFLAGS"
+     if test "$ac_cv_lib_pcre_pcre_compile" = "yes" ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: .setting PCRE_LIBS -L$with_pcre/lib -lpcre" >&5
+$as_echo ".setting PCRE_LIBS -L$with_pcre/lib -lpcre" >&6; }
+        PCRE_LIBS="-L$with_pcre/lib -lpcre"
+        test -d "$with_pcre/include" && PCRE_CFLAGS="-I$with_pcre/include"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking lib pcre" >&5
+$as_echo_n "checking lib pcre... " >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PCRE_LIBS" >&5
+$as_echo "$PCRE_LIBS" >&6; }
         
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
+     else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking lib pcre" >&5
+$as_echo_n "checking lib pcre... " >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no, (WARNING)" >&5
+$as_echo "no, (WARNING)" >&6; }
+        
+     fi
+  fi
 fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LIBPCRE_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libpcre" 2>&1`
-        else 
-	        LIBPCRE_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libpcre" 2>&1`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LIBPCRE_PKG_ERRORS" >&5
 
-	as_fn_error $? "Package requirements (libpcre) were not met:
 
-$LIBPCRE_PKG_ERRORS
 
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LIBPCRE_CFLAGS
-and LIBPCRE_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details." "$LINENO" 5        
-elif test $pkg_failed = untried; then
-     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LIBPCRE_CFLAGS
-and LIBPCRE_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details" "$LINENO" 5; }        
-else
-	LIBPCRE_CFLAGS=$pkg_cv_LIBPCRE_CFLAGS
-	LIBPCRE_LIBS=$pkg_cv_LIBPCRE_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	
-fi
 
 ac_config_files="$ac_config_files Makefile src/elementals.pc src/Makefile test/Makefile pod/Makefile"
 
