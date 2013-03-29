@@ -31,9 +31,10 @@ __list__hod_static list_t *  _list_new()  {
   l->last=NULL;
   l->current=NULL;
   l->mutex=(pthread_mutex_t *) mc_malloc(sizeof(pthread_mutex_t));
-  l->sem=(sem_t *) mc_malloc(sizeof(sem_t));
+  //l->sem=(sem_t *) mc_malloc(sizeof(sem_t));
+  l->sem = psem_new(0);
   pthread_mutex_init(l->mutex,NULL);
-  sem_init(l->sem, 0, 0);
+  //sem_init(l->sem, 0, 0);
   return l;
 }
 
@@ -47,8 +48,9 @@ __list__hod_static void _list_destroy(list_t *l,void (*data_destroyer)(list_data
     e=next;
   }
   pthread_mutex_destroy(l->mutex);
-  sem_destroy(l->sem);
-  mc_free(l->sem);
+  //sem_destroy(l->sem);
+  psem_destroy(l->sem);
+  //mc_free(l->sem);
   mc_free(l->mutex);
   mc_free(l);
 }

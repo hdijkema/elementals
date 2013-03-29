@@ -31,7 +31,8 @@
 #endif
 
 #include <pthread.h>
-#include <semaphore.h>
+#include <elementals/psem.h>
+//#include <semaphore.h>
 
 typedef void * list_data_t;
 
@@ -43,7 +44,7 @@ typedef struct __list_entry__ {
 
 typedef struct {
   pthread_mutex_t *mutex;
-  sem_t           *sem;
+  psem_t          *sem;
   list_entry_t    *first;
   list_entry_t    *last;
   list_entry_t    *current;

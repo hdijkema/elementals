@@ -21,6 +21,8 @@
 #define __FIFO__HOD
 
 #include <elementals/list.h>
+//#include <semaphore.h>
+#include <elementals/psem.h>
 
 #define _DECLARE_FIFO(MODIFIER, NAME, T) \
   typedef list_t NAME; \
@@ -40,15 +42,27 @@
                                                           _list_start_iter(fifo, LIST_LAST); \
                                                           _list_append_iter(fifo, (list_data_t) COPY(e)); \
                                                           _list_unlock(fifo); \
-                                                          sem_post(fifo->sem); \
+                                                          psem_post(fifo->sem); \
  } \
  MODIFIER inline T* NAME##_dequeue(NAME* fifo) { T* e; \
-                                                 sem_wait(fifo->sem); \
+                                                 psem_wait(fifo->sem); \
                                                  _list_lock(fifo); \
                                                  e = COPY((T *) _list_start_iter(fifo, LIST_FIRST)); \
                                                  _list_drop_iter(fifo,(void (*)(list_data_t)) DESTROY); \
                                                  _list_unlock(fifo); \
                                                  return e; \
+ } \
+ MODIFIER inline T* NAME##_dequeue_timeout(NAME* fifo, int timeout_in_ms) { \
+   T* e; \
+   if (psem_wait_timeout(fifo->sem, timeout_in_ms) == PSEM_OK) { \
+     _list_lock(fifo); \
+     e = COPY((T *) _list_start_iter(fifo, LIST_FIRST)); \
+     _list_drop_iter(fifo,(void (*)(list_data_t)) DESTROY); \
+     _list_unlock(fifo); \
+     return e; \
+   } else { \
+     return NULL; \
+   } \
  } \
  MODIFIER inline T* NAME##_peek(NAME* fifo) { T* e = NULL; \
                                               _list_lock(fifo); \
@@ -63,7 +77,7 @@
      _list_start_iter(fifo, LIST_FIRST); \
      _list_drop_iter(fifo, (void (*)(list_data_t)) DESTROY); \
    } \
-   sem_init(fifo->sem, 0, 0); \
+   psem_init(fifo->sem, 0); \
    _list_unlock(fifo); \
  }
                                                  

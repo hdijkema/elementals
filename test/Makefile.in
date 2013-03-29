@@ -246,6 +246,7 @@ test_hashEXTRA_DIST = ../src/libelementals.la
 test_hash_LDFLAGS = ../src/memcheck.o \
 	../src/crc.o \
 	../src/list.o \
+	../src/psem.o \
 	-pthread
 
 
@@ -262,7 +263,7 @@ test_list_SOURCES = \
 test_list_CPPFLAGS = -I../src \
 	-DUSE_MEMCHECK 
 
-test_list_LDFLAGS = ../src/memcheck.o ../src/crc.o -pthread
+test_list_LDFLAGS = ../src/memcheck.o ../src/crc.o ../src/psem.o -pthread
 test_fifo_CFLAGS = -I../src \
 	-DUSE_MEMCHECK 
 
@@ -272,7 +273,7 @@ test_fifo_SOURCES = \
 test_fifo_CPPFLAGS = -I../src \
 	-DUSE_MEMCHECK 
 
-test_fifo_LDFLAGS = ../src/memcheck.o ../src/list.o ../src/crc.o -pthread
+test_fifo_LDFLAGS = ../src/memcheck.o ../src/list.o ../src/psem.o ../src/crc.o -pthread
 test_array_CFLAGS = -I../src \
 	-DUSE_MEMCHECK 
 

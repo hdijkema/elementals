@@ -2,6 +2,7 @@
 #define _ELEMENTALS_H
 
 #include <elementals/os.h>
+#include <elementals/psem.h>
 #include <elementals/types.h>
 #include <elementals/log.h>
 #include <elementals/memcheck.h>

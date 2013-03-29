@@ -25,6 +25,7 @@ libelementals_la_SOURCES =  \
 	array.c \
 	memcheck.c \
 	fileinfo.c \
+	psem.c \
 	regexp.c
 
 libelementals_la_LDFLAGS = -pthread
@@ -51,6 +52,7 @@ otherinclude_HEADERS = elementals/hash.h \
 	elementals/memblock.h \
 	elementals/array.h \
 	elementals/os.h \
+	elementals/psem.h \
 	elementals/fileinfo.h \
 	elementals/types.h \
 	elementals/regexp.h

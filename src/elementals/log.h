@@ -34,16 +34,19 @@ extern "C" {
 #define LOG_ERROR 3
 #define LOG_FCALL 4
 #define LOG_FATAL 10
+#define LOG_WARN  5
 
 #define log_severity(s) ((s==LOG_DEBUG) ? "debug" : \
               ((s==LOG_INFO) ? "info  " : \
                 ((s==LOG_ERROR) ? "error" : \
                   ((s==LOG_FATAL) ? "fatal" : \
-                    ((s==LOG_FCALL) ? "fcall" : "unknown") \
+                    ((s==LOG_FCALL) ? "fcall" : \
+                      ((s==LOG_WARN) ? "warning" : "unknown") \
                       ) \
                         ) \
                           ) \
-                            )
+                            ) \
+                             )
 
 
 FILE * log_handle();
@@ -75,11 +78,13 @@ int log_this_severity(int severity);
 #define log_fatal(msg)  (log_msg(LOG_FATAL,msg),abort())
 #define log_fatal_errno(msg) (log_msg(LOG_FATAL,msg),log_msg(LOG_ERROR,(strerror(errno))),abort())
 #define log_info(msg)   log_msg(LOG_INFO,msg)
+#define log_warning(msg)   log_msg(LOG_WARN,msg)
 #define log_error(msg)  log_msg(LOG_ERROR,msg)
 #define log_errno(msg)  (log_msg(LOG_ERROR,msg),log_msg(LOG_ERROR,strerror(errno)))
 
 #define cond_log_error(cond,msg) if (cond) { log_error(msg); }
 #define cond_log_fatal(cond,msg) if (cond) { log_fatal(msg); }
+#define cond_log_warning(cond,msg) if (cond) { log_warning(msg); }
 #define cond_log_errno(cond,msg) if (cond) { log_errno(msg); }
 #define cond_log_fatal_errno(cond,msg) if (cond) { log_fatal_errno(msg); }
 
@@ -88,26 +93,31 @@ int log_this_severity(int severity);
 #define log_debug2(template,msg) log_msg2(LOG_DEBUG,template,msg)
 #define log_fatal2(template,msg) (log_msg2(LOG_FATAL,template,msg),abort())
 #define log_info2(template,msg) log_msg2(LOG_INFO,template,msg)
+#define log_warning2(template,msg) log_msg2(LOG_WARN,template,msg)
 #define log_error2(template,msg) log_msg2(LOG_ERROR,template,msg)
 
 #define log_debug3(template,msg,m2) log_msg3(LOG_DEBUG,template,msg,m2)
 #define log_fatal3(template,msg,m2) (log_msg3(LOG_FATAL,template,msg,m2),abort())
 #define log_info3(template,msg,m2) log_msg3(LOG_INFO,template,msg,m2)
+#define log_warning3(template,msg,m2) log_msg3(LOG_WARN,template,msg,m2)
 #define log_error3(template,msg,m2) log_msg3(LOG_ERROR,template,msg,m2)
 
 #define log_debug4(template,msg,m2,m3) log_msg4(LOG_DEBUG,template,msg,m2,m3)
 #define log_fatal4(template,msg,m2,m3) (log_msg4(LOG_FATAL,template,msg,m2,m3),abort())
 #define log_info4(template,msg,m2,m3) log_msg4(LOG_INFO,template,msg,m2,m3)
+#define log_warning4(template,msg,m2,m3) log_msg4(LOG_WARN,template,msg,m2,m3)
 #define log_error4(template,msg,m2,m3) log_msg4(LOG_ERROR,template,msg,m2,m3)
 
 #define log_debug5(template,msg,m2,m3,m4) log_msg5(LOG_DEBUG,template,msg,m2,m3,m4)
 #define log_fatal5(template,msg,m2,m3,m4) (log_msg5(LOG_FATAL,template,msg,m2,m3,m4),abort())
 #define log_info5(template,msg,m2,m3,m4) log_msg5(LOG_INFO,template,msg,m2,m3,m4)
+#define log_warning5(template,msg,m2,m3,m4) log_msg5(LOG_WARN,template,msg,m2,m3,m4)
 #define log_error5(template,msg,m2,m3,m4) log_msg5(LOG_ERROR,template,msg,m2,m3,m4)
 
 #define log_debug6(template,msg,m2,m3,m4,m5) log_msg6(LOG_DEBUG,template,msg,m2,m3,m4,m5)
 #define log_fatal6(template,msg,m2,m3,m4,m5) (log_msg6(LOG_FATAL,template,msg,m2,m3,m4,m5),abort())
 #define log_info6(template,msg,m2,m3,m4,m5) log_msg6(LOG_INFO,template,msg,m2,m3,m4,m5)
+#define log_warning6(template,msg,m2,m3,m4,m5) log_msg6(LOG_WARN,template,msg,m2,m3,m4,m5)
 #define log_error6(template,msg,m2,m3,m4,m5) log_msg6(LOG_ERROR,template,msg,m2,m3,m4,m5)
 
 
