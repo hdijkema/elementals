@@ -2,7 +2,13 @@
 #include <elementals/array.h>
 #include <elementals/log.h>
 #include <elementals/memcheck.h>
+#include <elementals/os.h>
+
+#ifdef EL_OSX
+#include "../3dparty/pcre.h"
+#else
 #include <pcre.h>
+#endif
 #include <ctype.h>
 
 static inline hre_match_t* hre_copy_match(hre_match_t *e)

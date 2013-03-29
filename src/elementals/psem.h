@@ -3,7 +3,9 @@
 
 #include <pthread.h>
 
+#ifndef EL_OSX
 #define USE_SEM_T
+#endif
 
 #ifdef USE_SEM_T
 #include <semaphore.h>

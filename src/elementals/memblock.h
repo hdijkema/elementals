@@ -9,8 +9,16 @@
 #ifndef _memblock_h
 #define _memblock_h
 
+#ifdef __off_t_defined
+#define MEMBLOCK_OFF_T
+#endif
+
+#ifdef _OFF_T
+#define MEMBLOCK_OFF_T
+#endif
+
 #include <stdio.h>
-#ifndef __off_t_defined
+#ifndef MEMBLOCK_OFF_T
 typedef long off_t;
 #endif
 
