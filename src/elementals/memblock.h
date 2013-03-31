@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 
+#ifndef EL_LINUX
+
 #ifdef __off_t_defined
 #define MEMBLOCK_OFF_T
 #endif
@@ -22,6 +24,8 @@
 #ifndef MEMBLOCK_OFF_T
 typedef long off_t;
 #endif
+
+#endif // EL_LINUX
 
 typedef struct {
   void *block;
